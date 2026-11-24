@@ -111,3 +111,26 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Brands strip preview (same motion as the storefront) ---- */
+:root {
+  --sx: 1;
+}
+[dir="rtl"] {
+  --sx: -1;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(calc(var(--sx) * -50%));
+  }
+}
+.marquee-track {
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}

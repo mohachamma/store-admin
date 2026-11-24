@@ -50,6 +50,9 @@ Clean and simple: white background, black primary buttons, rounded corners, same
 - Connect this repo to **Vercel** once and set `NEXT_PUBLIC_API_URL`.
 - Create the first admin user (the API repo will document how).
 
+## Everything editable (owner's rule)
+Whatever the storefront shows must be editable here. When `store-web` gets a new element, add: the API fields/endpoints (write them under `## Needs from API`), and a screen in this dashboard (nav entry, list + edit form, preview when it helps). Reuse `src/components/form/*` (I18nFields ar/fr/en, ImageField, DateTimeField, SwitchField, FormSheet).
+
 ## Rules
 - Run `npm run build` and `npm run lint` before every push; fix all errors.
 - Small, clear commits on `main` unless the owner asks for branches.
@@ -57,9 +60,16 @@ Clean and simple: white background, black primary buttons, rounded corners, same
 
 ## Progress
 - [x] Phase 1 — setup: Next.js 16 + Tailwind 4 + shadcn/ui (button, input, label, card, badge, sheet, skeleton — written by hand, `components.json` ready) + next-intl (ar/fr via cookie), brand identity shared with the storefront (wordmark + black ADMIN tag), login page (server action, httpOnly cookie), protected layout (`src/proxy.ts` + `requireSession`), sidebar (desktop) / bottom bar + "More" sheet (mobile), mock API adapter, `gen:api`, noindex
+- [x] Storefront content screens (mock, in-memory): **Brands** (add/edit/delete/hide/reorder brands + brands-strip settings: show, animation on/off, speed, pause on hover, title; live preview), **Offers & sales** (banners with ar/fr/en texts, image, dark/light, button + link, schedule, countdown, status), **Content** (announcement bar text with preview)
 - [~] Phase 2 — overview page done on mock data (revenue today/week/month, new orders, orders by status, top products, low stock); orders list/detail next
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.
+- `GET/POST /admin/brands`, `PUT/DELETE /admin/brands/{id}`, `POST /admin/brands/{id}/move` `{ direction: -1|1 }` — `AdminBrand { id, name, logoUrl, href, isActive }`
+- `GET/PUT /admin/brands-strip` — `{ enabled, animated, speed (5–120 s per loop), pauseOnHover, title: {ar,fr,en} }`
+- `GET/POST /admin/offers`, `PUT/DELETE /admin/offers/{id}` — `AdminOffer { id, label, title, subtitle, ctaLabel: {ar,fr,en}, href, imageUrl, theme: "dark"|"light", showCountdown, startsAt, endsAt (ISO), isActive }` (DB table `offers` already exists; countdown requires `endsAt`)
+- `GET/PUT /admin/site` — `{ announcement: {ar,fr,en} }` (empty hides the bar)
+- `GET/PUT /admin/sale-page` — `{ enabled, title: {ar,fr,en}, subtitle: {ar,fr,en} }` (UI to be added; stored in setting `sale_page`)
+- `POST /admin/uploads` (multipart `file`, images ≤ 3 MB) → `{ url }` (Supabase Storage, bucket `product-images`)
 - `POST /auth/login` `{ email, password }` → `{ accessToken, expiresIn, user: { id, email, role } }`; 401 on bad credentials, 403 if role ≠ `admin` (or return the role and the dashboard refuses).
 - `GET /admin/stats/overview` → `{ newOrdersToday, revenue: { today, week, month }, revenueLast7Days: number[7], ordersByStatus: { pending, confirmed, shipped, delivered, cancelled, returned }, topProducts: [{ id, name, image, unitsSold, revenue }], lowStock: [{ variantId, productName, size, stock, image }] }` (integer DZD).
