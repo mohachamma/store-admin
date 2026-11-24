@@ -1,4 +1,6 @@
 import {
+  Award,
+  BadgePercent,
   FolderTree,
   LayoutGrid,
   Package,
@@ -11,7 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type NavKey = "overview" | "orders" | "products" | "catalog" | "content" | "shipping" | "discounts" | "customers" | "settings";
+export type NavKey = "overview" | "orders" | "products" | "catalog" | "brands" | "offers" | "content" | "shipping" | "discounts" | "customers" | "settings";
 
 export interface NavItem {
   key: NavKey;
@@ -28,6 +30,8 @@ export const navItems: NavItem[] = [
   { key: "orders", href: "/orders", icon: Package, primary: true, phase: 2 },
   { key: "products", href: "/products", icon: Shirt, primary: true, phase: 3 },
   { key: "catalog", href: "/catalog", icon: FolderTree, phase: 4 },
+  { key: "brands", href: "/brands", icon: Award, phase: 4 },
+  { key: "offers", href: "/offers", icon: BadgePercent, phase: 4 },
   { key: "content", href: "/content", icon: Images, phase: 4 },
   { key: "shipping", href: "/shipping", icon: Truck, phase: 4 },
   { key: "discounts", href: "/discounts", icon: TicketPercent, phase: 4 },

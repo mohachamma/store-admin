@@ -27,4 +27,28 @@ export const realApi: AdminApi = {
     }
   },
   getOverview: (token) => call<Overview>("/admin/stats/overview", { token }),
+
+  listBrands: (token) => call("/admin/brands", { token }),
+  saveBrand: (token, b) =>
+    b.id ? call(`/admin/brands/${b.id}`, { token, method: "PUT", body: JSON.stringify(b) }) : call("/admin/brands", { token, method: "POST", body: JSON.stringify(b) }),
+  deleteBrand: async (token, id) => void (await call(`/admin/brands/${id}`, { token, method: "DELETE" })),
+  moveBrand: async (token, id, direction) => void (await call(`/admin/brands/${id}/move`, { token, method: "POST", body: JSON.stringify({ direction }) })),
+  getBrandsStrip: (token) => call("/admin/brands-strip", { token }),
+  saveBrandsStrip: async (token, s) => void (await call("/admin/brands-strip", { token, method: "PUT", body: JSON.stringify(s) })),
+
+  listOffers: (token) => call("/admin/offers", { token }),
+  saveOffer: (token, o) =>
+    o.id ? call(`/admin/offers/${o.id}`, { token, method: "PUT", body: JSON.stringify(o) }) : call("/admin/offers", { token, method: "POST", body: JSON.stringify(o) }),
+  deleteOffer: async (token, id) => void (await call(`/admin/offers/${id}`, { token, method: "DELETE" })),
+
+  getSiteContent: (token) => call("/admin/site", { token }),
+  saveSiteContent: async (token, c) => void (await call("/admin/site", { token, method: "PUT", body: JSON.stringify(c) })),
+
+  async uploadImage(token, file) {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`${BASE}/admin/uploads`, { method: "POST", body: form, headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+    if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+    return ((await res.json()) as { url: string }).url;
+  },
 };
