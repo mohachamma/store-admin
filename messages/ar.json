@@ -1,0 +1,8 @@
+{
+  "meta": { "title": "لوحة التحكم" },
+  "nav": { "overview": "نظرة عامة", "orders": "الطلبات", "products": "المنتجات", "catalog": "الكتالوج", "content": "محتوى المتجر", "shipping": "الشحن", "discounts": "أكواد الخصم", "customers": "الزبائن", "settings": "الإعدادات", "more": "المزيد", "menu": "القائمة", "notifications": "الإشعارات", "logout": "تسجيل الخروج", "language": "اللغة", "openStore": "فتح المتجر", "account": "الحساب" },
+  "login": { "title": "تسجيل الدخول", "subtitle": "لوحة تحكم المتجر — للمدير وفريق العمل فقط.", "email": "البريد الإلكتروني", "password": "كلمة المرور", "submit": "دخول", "invalid": "البريد الإلكتروني أو كلمة المرور غير صحيحة.", "notAdmin": "هذا الحساب لا يملك صلاحية الدخول إلى اللوحة.", "error": "تعذّر الاتصال بالخادم. حاول مرة أخرى.", "mockHint": "وضع التجربة: {email} / {password}" },
+  "overview": { "title": "نظرة عامة", "hello": "مرحباً 👋", "subtitle": "هذا ملخص نشاط متجرك.", "newOrdersToday": "طلبات جديدة اليوم", "revenue": "المداخيل", "today": "اليوم", "week": "هذا الأسبوع", "month": "هذا الشهر", "ordersByStatus": "الطلبات حسب الحالة", "topProducts": "الأكثر مبيعاً", "lowStock": "تنبيه المخزون", "sold": "{count} مبيع", "left": "بقي {count}", "outOfStock": "نفد", "size": "مقاس {size}", "viewAll": "عرض الكل", "pendingHint": "{count} في انتظار التأكيد" },
+  "status": { "pending": "قيد الانتظار", "confirmed": "مؤكد", "shipped": "تم الشحن", "delivered": "تم التسليم", "cancelled": "ملغى", "returned": "مُرجع" },
+  "common": { "comingSoon": "هذه الصفحة قيد الإنشاء", "phase": "ستكون جاهزة في المرحلة {phase}.", "close": "إغلاق", "mockMode": "بيانات تجريبية", "noNotifications": "لا توجد إشعارات جديدة." }
+}

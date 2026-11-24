@@ -1,0 +1,65 @@
+# store-admin — Admin dashboard of the clothing store
+
+Online clothing store for the Algerian market. The system is split into **three independent repositories**, all in **TypeScript**:
+
+| Repo | Role |
+|---|---|
+| `store-api` | Server: database, business rules, payments, delivery company |
+| `store-web` | Customer storefront (Next.js) |
+| `store-admin` (this one) | Admin dashboard (Next.js), for the owner and staff only |
+
+The owner speaks Arabic — reply to him in Arabic. Code, comments and commit messages in English.
+
+## How the repos are connected
+- This app **never touches the database**. It talks only to `store-api` (`/admin/*` endpoints) over HTTPS (`NEXT_PUBLIC_API_URL`).
+- API types are **generated** from the API's `/openapi.json` (`npm run gen:api`, using `openapi-typescript`). Never hand-write API types.
+- **While `store-api` is not ready**, build against a typed mock adapter (`src/lib/api/mock.ts`) switched by `NEXT_PUBLIC_USE_MOCK=true`.
+- Login through Supabase Auth via the API; only users with role `admin` get in. Every page is protected (middleware redirects to `/login`). Secure cookie, no token in localStorage.
+
+## Stack
+- **Next.js** (App Router, TypeScript strict), **Tailwind CSS** + **shadcn/ui** (tables, forms, dialogs), logical CSS properties for RTL.
+- **next-intl**: `ar` (default, RTL) and `fr`. No hard-coded UI strings.
+- Currency **DZD (دج)**.
+- Deploy on **Vercel** from GitHub `main`, on its own domain/subdomain (e.g. `admin.…`). Add `noindex` everywhere.
+- Works well on a **phone** (the owner will often use it from his phone): responsive tables → cards on small screens.
+
+## Design
+Clean and simple: white background, black primary buttons, rounded corners, same visual identity as the storefront (`src/config/brand.ts`, placeholder name "Store"). Mobile-first.
+
+## Features
+- **Overview:** new orders today, revenue (today / week / month), top products, low-stock alerts, orders by status.
+- **Orders:** list with filters (status, date, wilaya, payment) and search; order page with items, totals, payment status, status change; **confirm order** (sends it to the delivery company through the API, which then removes the customer's personal data from our DB); button to open the parcel in the delivery company's dashboard by tracking number; print invoice / delivery slip; `wa.me` button to contact the customer on WhatsApp while the order is still pending.
+- **New-order alert:** live badge + sound (Supabase Realtime via the API's event channel), notifications list.
+- **Products:** create / edit / delete, variants (size, color, stock, price, compare-at price), multi-image upload with drag-to-reorder, publish/unpublish, bulk price/stock update.
+- **Catalog:** categories, collections, brands.
+- **Storefront content:** hero slides, banners, announcement bar text.
+- **Shipping:** fee per wilaya (table editable in place), home vs desk fee.
+- **Discount codes**, **customers list** (orders count only, no personal data beyond what the API exposes).
+- **Settings:** admins list (invite / remove), store info.
+
+## Build order (commit after each phase)
+1. Setup: Next.js + Tailwind + shadcn/ui + next-intl, brand config, login page, protected layout, sidebar (bottom bar on mobile), mock API adapter, `gen:api` script.
+2. Overview page + orders list/detail (against mock).
+3. Products CRUD with variants and image upload.
+4. Catalog, shipping fees, slides/banners, discount codes.
+5. Connect everything to the real API; order confirmation → delivery company; new-order alerts.
+6. Invoices / delivery slips, customers, settings.
+7. Polish: loading/empty/error states, accessibility, performance.
+
+## Things the owner must do himself (ask step by step)
+- Connect this repo to **Vercel** once and set `NEXT_PUBLIC_API_URL`.
+- Create the first admin user (the API repo will document how).
+
+## Rules
+- Run `npm run build` and `npm run lint` before every push; fix all errors.
+- Small, clear commits on `main` unless the owner asks for branches.
+- Keep `## Progress` up to date. If the API is missing something the dashboard needs, write it under `## Needs from API` so the owner can pass it to the `store-api` session.
+
+## Progress
+- [x] Phase 1 — setup: Next.js 16 + Tailwind 4 + shadcn/ui (button, input, label, card, badge, sheet, skeleton — written by hand, `components.json` ready) + next-intl (ar/fr via cookie), brand identity shared with the storefront (wordmark + black ADMIN tag), login page (server action, httpOnly cookie), protected layout (`src/proxy.ts` + `requireSession`), sidebar (desktop) / bottom bar + "More" sheet (mobile), mock API adapter, `gen:api`, noindex
+- [~] Phase 2 — overview page done on mock data (revenue today/week/month, new orders, orders by status, top products, low stock); orders list/detail next
+
+## Needs from API
+Temporary shapes are in `src/lib/api/types.ts`.
+- `POST /auth/login` `{ email, password }` → `{ accessToken, expiresIn, user: { id, email, role } }`; 401 on bad credentials, 403 if role ≠ `admin` (or return the role and the dashboard refuses).
+- `GET /admin/stats/overview` → `{ newOrdersToday, revenue: { today, week, month }, revenueLast7Days: number[7], ordersByStatus: { pending, confirmed, shipped, delivered, cancelled, returned }, topProducts: [{ id, name, image, unitsSold, revenue }], lowStock: [{ variantId, productName, size, stock, image }] }` (integer DZD).

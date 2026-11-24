@@ -1,0 +1,8 @@
+{
+  "meta": { "title": "Tableau de bord" },
+  "nav": { "overview": "Vue d'ensemble", "orders": "Commandes", "products": "Produits", "catalog": "Catalogue", "content": "Contenu boutique", "shipping": "Livraison", "discounts": "Codes promo", "customers": "Clients", "settings": "Paramètres", "more": "Plus", "menu": "Menu", "notifications": "Notifications", "logout": "Se déconnecter", "language": "Langue", "openStore": "Voir la boutique", "account": "Compte" },
+  "login": { "title": "Connexion", "subtitle": "Tableau de bord de la boutique — réservé à l'équipe.", "email": "E-mail", "password": "Mot de passe", "submit": "Se connecter", "invalid": "E-mail ou mot de passe incorrect.", "notAdmin": "Ce compte n'a pas accès au tableau de bord.", "error": "Impossible de joindre le serveur. Réessayez.", "mockHint": "Mode démo : {email} / {password}" },
+  "overview": { "title": "Vue d'ensemble", "hello": "Bonjour 👋", "subtitle": "Voici l'activité de votre boutique.", "newOrdersToday": "Nouvelles commandes aujourd'hui", "revenue": "Chiffre d'affaires", "today": "Aujourd'hui", "week": "Cette semaine", "month": "Ce mois", "ordersByStatus": "Commandes par statut", "topProducts": "Meilleures ventes", "lowStock": "Stock faible", "sold": "{count} vendus", "left": "Reste {count}", "outOfStock": "Épuisé", "size": "Taille {size}", "viewAll": "Tout voir", "pendingHint": "{count} à confirmer" },
+  "status": { "pending": "En attente", "confirmed": "Confirmée", "shipped": "Expédiée", "delivered": "Livrée", "cancelled": "Annulée", "returned": "Retournée" },
+  "common": { "comingSoon": "Page en construction", "phase": "Disponible à la phase {phase}.", "close": "Fermer", "mockMode": "Données de démo", "noNotifications": "Aucune nouvelle notification." }
+}
