@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -38,6 +38,10 @@ interface MockDb {
   freeShippingOver: number | null;
   codes: AdminDiscountCode[];
   slides: AdminSlide[];
+  whyUs: AdminWhyUs;
+  homeCards: AdminHomeCard[];
+  newsletter: AdminNewsletter;
+  subscribers: { id: string; email: string; createdAt: string }[];
 }
 /** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
 type MockOrder = AdminOrderRow & {
@@ -77,6 +81,16 @@ const db = (): MockDb =>
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
+    whyUs: { enabled: true, title: { ar: "لماذا نحن", fr: "Pourquoi nous", en: "Why shop with us" }, items: [
+      { icon: "truck", title: { ar: "توصيل إلى 58 ولاية", fr: "Livraison dans 58 wilayas", en: "Delivery to 58 wilayas" }, text: { ar: "نوصّل طلبك إلى باب بيتك.", fr: "", en: "" } },
+      { icon: "card", title: { ar: "ادفع عند الاستلام", fr: "Paiement à la livraison", en: "Pay on delivery" }, text: { ar: "", fr: "", en: "" } },
+    ] },
+    homeCards: [
+      { id: "hc_men", title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث الموديلات", fr: "", en: "" }, imageUrl: "/placeholders/hoodie-black-1.svg", href: "/search?category=outerwear", isActive: true },
+      { id: "hc_casual", title: { ar: "كاجوال", fr: "Casual", en: "Casual" }, subtitle: { ar: "", fr: "", en: "" }, imageUrl: "/placeholders/tee-cream-1.svg", href: "/search?category=tops", isActive: true },
+    ],
+    newsletter: { enabled: true, title: { ar: "كن أول من يعلم", fr: "", en: "" }, subtitle: { ar: "اترك بريدك لتصلك العروض.", fr: "", en: "" }, button: { ar: "اشترك", fr: "", en: "" } },
+    subscribers: [{ id: "ns_1", email: "sara@example.com", createdAt: new Date().toISOString() }],
     slides: [{ id: "sl_winter", title: { ar: "تشكيلة الشتاء", fr: "Collection hiver", en: "Winter Collection" }, subtitle: { ar: "قطع دافئة بخطوط بسيطة", fr: "", en: "" }, imageUrl: "/placeholders/hoodie-stone.svg", collectionId: "col_winter", linkUrl: null, isActive: true, startsAt: null, endsAt: null }],
     readEventIds: new Set<string>(),
     sale: {
@@ -359,6 +373,43 @@ export const mockApi: AdminApi = {
   },
   async deleteDiscountCode(_t, id) {
     db().codes = db().codes.filter((c) => c.id !== id);
+  },
+  async getWhyUs() {
+    return db().whyUs;
+  },
+  async saveWhyUs(_t, input) {
+    db().whyUs = input;
+  },
+  async listHomeCards() {
+    return db().homeCards;
+  },
+  async saveHomeCard(_t, id, input) {
+    const d = db();
+    const t = (v?: { ar?: string; fr?: string; en?: string }) => ({ ar: v?.ar ?? "", fr: v?.fr ?? "", en: v?.en ?? "" });
+    const base = { title: t(input.title), subtitle: t(input.subtitle), imageUrl: input.imageUrl, href: input.href ?? null, isActive: input.isActive ?? true };
+    const existing = id ? d.homeCards.find((c) => c.id === id) : undefined;
+    if (id && !existing) throw fail(404, "Card not found");
+    const row = existing ? Object.assign(existing, base) : { id: newId("hc"), ...base };
+    if (!existing) d.homeCards.push(row);
+    return row;
+  },
+  async deleteHomeCard(_t, id) {
+    db().homeCards = db().homeCards.filter((c) => c.id !== id);
+  },
+  async moveHomeCard(_t, id, direction) {
+    move(db().homeCards, id, direction);
+  },
+  async getNewsletter() {
+    return db().newsletter;
+  },
+  async saveNewsletter(_t, input) {
+    db().newsletter = input;
+  },
+  async listSubscribers() {
+    return { total: db().subscribers.length, items: db().subscribers };
+  },
+  async deleteSubscriber(_t, id) {
+    db().subscribers = db().subscribers.filter((x) => x.id !== id);
   },
   async listSlides() {
     return db().slides;
