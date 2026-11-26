@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminOffer, AdminOrderDetail, AdminOrderRow, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminOffer, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -30,6 +30,9 @@ interface MockDb {
   sale: SalePageSettings;
   orders: MockOrder[];
   readEventIds: Set<string>;
+  products: AdminProduct[];
+  categories: Omit<AdminCategory, "productCount">[];
+  collections: AdminCollection[];
 }
 /** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
 type MockOrder = AdminOrderRow & {
@@ -62,6 +65,7 @@ const db = (): MockDb =>
       },
     ],
     orders: sampleOrders(),
+    ...sampleCatalog(),
     readEventIds: new Set<string>(),
     sale: {
       enabled: true,
@@ -100,6 +104,37 @@ function sampleOrders(): MockOrder[] {
     mk(1002, "cancelled", 70, 19, "سطيف", 800, [item("Chelsea Boot", "41", 11500)]),
   ];
 }
+
+/** Six sample products with variants and local placeholder photos (mock mode only). */
+function sampleCatalog() {
+  const cat = (slug: string, ar: string, fr: string, en: string) => ({ id: `c_${slug}`, slug, name: { ar, fr, en }, imageUrl: null, isActive: true });
+  const categories = [cat("outerwear", "ملابس خارجية", "Vestes & manteaux", "Outerwear"), cat("tops", "قمصان وتيشرتات", "Hauts", "Tops"), cat("footwear", "أحذية", "Chaussures", "Footwear"), cat("bottoms", "سراويل", "Bas", "Bottoms")];
+  const p = (slug: string, ar: string, fr: string, en: string, categoryId: string, art: string, price: number, compare: number | null, sizes: string[], pub = true): AdminProduct => ({
+    id: `p_${slug}`, slug, name: { ar, fr, en }, description: { ar: "", fr: "", en: "" }, categoryId, brandId: null, isPublished: pub, isNew: false,
+    images: [{ url: `/placeholders/${art}.svg` }],
+    variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare })),
+  });
+  const products = [
+    p("nylon-zip-hoodie", "هودي بسحاب نايلون", "Hoodie zippé en nylon", "Nylon Full Zip Hoodie", "c_outerwear", "hoodie-stone", 7900, null, ["XS", "S", "M", "L", "XL"]),
+    p("hooded-deck-coat", "معطف طويل بقبعة", "Manteau long à capuche", "Hooded Deck Coat", "c_outerwear", "coat-sand", 12900, null, ["S", "M", "L"]),
+    p("essential-hoodie-black", "هودي أسود أساسي", "Hoodie essentiel noir", "Essential Hoodie Black", "c_outerwear", "hoodie-black", 5900, 7200, ["S", "M", "L"], false),
+    p("red-skate-mid", "حذاء رياضي أحمر", "Baskets rouges", "Red Skate Mid Sneaker", "c_footwear", "sneaker-red", 9800, null, ["41", "42", "43"]),
+    p("chelsea-boot", "حذاء تشيلسي", "Bottines Chelsea", "Chelsea Boot", "c_footwear", "boot-cream", 11500, null, ["41", "42"]),
+    p("slim-denim-jean", "جينز ضيّق فاتح", "Jean slim clair", "Slim Denim Jean", "c_bottoms", "jeans-light", 5400, 6500, ["S", "M", "L"]),
+  ];
+  const collections: AdminCollection[] = [{ id: "col_winter", slug: "winter", title: { ar: "تشكيلة الشتاء", fr: "Collection hiver", en: "Winter Collection" }, subtitle: { ar: "", fr: "", en: "" }, heroUrl: "/placeholders/hoodie-stone.svg", isPublished: true, productIds: ["p_nylon-zip-hoodie", "p_hooded-deck-coat"] }];
+  return { products, categories, collections };
+}
+
+const fail = (status: number, message: string) => Object.assign(new Error(message), { status });
+const slugOf = (name: { fr: string; en: string }, fallback: string) =>
+  (name.fr || name.en).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || `${fallback}-${Math.random().toString(36).slice(2, 6)}`;
+const move = <T extends { id: string }>(list: T[], id: string, direction: -1 | 1) => {
+  const i = list.findIndex((x) => x.id === id);
+  const j = i + direction;
+  if (i < 0 || j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j]!, list[i]!];
+};
 
 const newId = (p: string) => `${p}_${Math.random().toString(36).slice(2, 10)}`;
 
@@ -152,6 +187,119 @@ export const mockApi: AdminApi = {
   },
   async markEventsRead() {
     for (const o of db().orders) db().readEventIds.add(o.id);
+  },
+
+  async listProducts(_t, f, locale) {
+    const d = db();
+    const lang = (locale === "fr" ? "fr" : "ar") as "ar" | "fr";
+    let rows = d.products.filter((p) => (!f.status || (f.status === "published") === p.isPublished) && (!f.categoryId || p.categoryId === f.categoryId));
+    if (f.q) {
+      const q = f.q.toLowerCase();
+      rows = rows.filter((p) => [p.name.ar, p.name.fr, p.name.en, p.slug].some((x) => x.toLowerCase().includes(q)));
+    }
+    const items = rows.slice(f.offset ?? 0, (f.offset ?? 0) + (f.limit ?? 30)).map((p) => {
+      const cheapest = [...p.variants].sort((a, b) => a.price - b.price)[0];
+      const cat = d.categories.find((c) => c.id === p.categoryId);
+      return {
+        id: p.id, slug: p.slug, name: p.name[lang] || p.name.ar, categoryName: cat ? cat.name[lang] || cat.name.ar : "", isPublished: p.isPublished, isNew: p.isNew,
+        price: cheapest?.price ?? null, compareAtPrice: cheapest?.compareAtPrice ?? null, totalStock: p.variants.reduce((n, v) => n + v.stock, 0), variantCount: p.variants.length, image: p.images[0]?.url ?? null,
+      };
+    });
+    return { items, total: rows.length };
+  },
+  async getProduct(_t, id) {
+    const p = db().products.find((x) => x.id === id);
+    if (!p) throw fail(404, "Product not found");
+    return p;
+  },
+  async saveProduct(_t, id, input) {
+    const d = db();
+    if (input.isPublished && (!input.variants?.length || !input.images?.length)) throw fail(422, "A published product needs at least one variant and one image");
+    const old = id ? d.products.find((x) => x.id === id) : undefined;
+    if (id && !old) throw fail(404, "Product not found");
+    const product: AdminProduct = {
+      id: old?.id ?? newId("p"), slug: old?.slug ?? slugOf(input.name, "product"), name: { ...input.name }, description: { ar: input.description?.ar ?? "", fr: input.description?.fr ?? "", en: input.description?.en ?? "" },
+      categoryId: input.categoryId, brandId: input.brandId ?? null, isPublished: input.isPublished ?? false, isNew: input.isNew ?? false,
+      images: (input.images ?? []).map((url) => ({ url })),
+      variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null })),
+    };
+    if (old) d.products[d.products.indexOf(old)] = product;
+    else d.products.unshift(product);
+    return product;
+  },
+  async deleteProduct(_t, id) {
+    const d = db();
+    d.products = d.products.filter((p) => p.id !== id);
+    for (const c of d.collections) c.productIds = c.productIds.filter((x) => x !== id);
+  },
+  async publishProducts(_t, ids, isPublished) {
+    let n = 0;
+    for (const p of db().products) if (ids.includes(p.id) && (!isPublished || (p.variants.length && p.images.length))) { p.isPublished = isPublished; n++; }
+    return n;
+  },
+  async listCategories() {
+    const d = db();
+    return d.categories.map((c) => ({ ...c, productCount: d.products.filter((p) => p.categoryId === c.id).length }));
+  },
+  async saveCategory(_t, id, input) {
+    const d = db();
+    const base = { name: { ...input.name }, imageUrl: input.imageUrl ?? null, isActive: input.isActive ?? true };
+    const existing = id ? d.categories.find((c) => c.id === id) : undefined;
+    if (id && !existing) throw fail(404, "Category not found");
+    const cat = existing ? Object.assign(existing, base) : { id: newId("c"), slug: slugOf(input.name, "category"), ...base };
+    if (!existing) d.categories.push(cat);
+    return { ...cat, productCount: d.products.filter((p) => p.categoryId === cat.id).length };
+  },
+  async deleteCategory(_t, id) {
+    const d = db();
+    if (d.products.some((p) => p.categoryId === id)) throw fail(409, "Move or delete the category's products first");
+    d.categories = d.categories.filter((c) => c.id !== id);
+  },
+  async moveCategory(_t, id, direction) {
+    move(db().categories, id, direction);
+  },
+  async listCollections() {
+    return db().collections;
+  },
+  async saveCollection(_t, id, input) {
+    const d = db();
+    const existing = id ? d.collections.find((c) => c.id === id) : undefined;
+    if (id && !existing) throw fail(404, "Collection not found");
+    const base = { title: { ...input.title }, subtitle: { ar: input.subtitle?.ar ?? "", fr: input.subtitle?.fr ?? "", en: input.subtitle?.en ?? "" }, heroUrl: input.heroUrl ?? null, isPublished: input.isPublished ?? false, productIds: [...new Set(input.productIds ?? [])] };
+    const col = existing ? Object.assign(existing, base) : { id: newId("col"), slug: slugOf(input.title, "collection"), ...base };
+    if (!existing) d.collections.push(col);
+    return col;
+  },
+  async deleteCollection(_t, id) {
+    db().collections = db().collections.filter((c) => c.id !== id);
+  },
+  async moveCollection(_t, id, direction) {
+    move(db().collections, id, direction);
+  },
+  async listVariants(_t, f, locale) {
+    const lang = (locale === "fr" ? "fr" : "ar") as "ar" | "fr";
+    let rows = db().products.flatMap((p) => p.variants.map((v) => ({ variantId: v.id, productId: p.id, productName: p.name[lang] || p.name.ar, image: p.images[0]?.url ?? null, size: v.size, color: v.color, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice })));
+    if (f.lowStock) rows = rows.filter((r) => r.stock <= 3);
+    if (f.q) rows = rows.filter((r) => `${r.productName} ${r.size}`.toLowerCase().includes(f.q!.toLowerCase()));
+    return { items: rows.slice(f.offset ?? 0, (f.offset ?? 0) + (f.limit ?? 100)), total: rows.length };
+  },
+  async bulkUpdateVariants(_t, updates) {
+    const all = db().products.flatMap((p) => p.variants);
+    // all or nothing: validate first
+    for (const u of updates) {
+      const v = all.find((x) => x.id === u.variantId);
+      if (!v) throw fail(404, "A variant does not exist");
+      const price = u.price ?? v.price;
+      const compare = u.compareAtPrice === undefined ? v.compareAtPrice : u.compareAtPrice;
+      if (compare !== null && compare <= price) throw fail(422, "The compare-at price must be higher than the price");
+    }
+    for (const u of updates) {
+      const v = all.find((x) => x.id === u.variantId)!;
+      if (u.price !== undefined) v.price = u.price;
+      if (u.compareAtPrice !== undefined) v.compareAtPrice = u.compareAtPrice;
+      if (u.stock !== undefined) v.stock = u.stock;
+    }
+    return updates.length;
   },
 
   async listBrands() {
