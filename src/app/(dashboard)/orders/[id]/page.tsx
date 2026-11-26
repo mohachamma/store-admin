@@ -12,7 +12,7 @@ import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
 import { formatDZD } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { setStatusAction } from "../actions";
+import { refreshTrackingAction, setStatusAction } from "../actions";
 import { statusVariant } from "../page";
 import { ConfirmOrderForm } from "./ConfirmOrderForm";
 import { PrintButton } from "./PrintButton";
@@ -24,6 +24,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   const token = await requireSession();
   const locale = (await getLocale()) as Locale;
   const [t, ts] = await Promise.all([getTranslations("orders"), getTranslations("status")]);
+  const delivery = await api.getDelivery(token).catch(() => null);
+  const active = delivery?.providers.find((p) => p.id === delivery.provider);
+  const autoCompany = active && active.id !== "manual" && active.configured ? active.name : null;
   const o = await api.getOrder(token, id, locale).catch((e: { status?: number }) => {
     if (e.status === 404 || e.status === 422) notFound();
     throw e;
@@ -82,6 +85,12 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               <CardContent className="space-y-1 text-sm">
                 <p><span className="text-muted-foreground">{t("company")}:</span> {o.deliveryCompany}</p>
                 <p><span className="text-muted-foreground">{t("tracking")}:</span> <strong dir="ltr">{o.trackingNumber}</strong></p>
+                {o.deliveryStatus ? <p><span className="text-muted-foreground">{t("deliveryStatus")}:</span> <span dir="ltr">{o.deliveryStatus}</span></p> : null}
+                {o.deliveryCompany && o.deliveryCompany !== "manual" && ["confirmed", "shipped"].includes(o.status) ? (
+                  <form action={refreshTrackingAction.bind(null, o.id)} className="pt-1 print:hidden">
+                    <button type="submit" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>{t("refreshTracking")}</button>
+                  </form>
+                ) : null}
               </CardContent>
             </Card>
           ) : null}
@@ -114,7 +123,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           {o.status === "pending" ? (
             <Card className="print:hidden">
               <CardHeader><CardTitle>{t("confirm")}</CardTitle></CardHeader>
-              <CardContent><ConfirmOrderForm id={o.id} /></CardContent>
+              <CardContent><ConfirmOrderForm id={o.id} autoCompany={autoCompany} /></CardContent>
             </Card>
           ) : null}
 

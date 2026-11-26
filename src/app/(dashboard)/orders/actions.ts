@@ -8,16 +8,19 @@ import { requireSession } from "@/lib/auth";
 
 const fail = async (e: unknown): Promise<FormState> => {
   const t = await getTranslations("orders.errors");
-  return { error: (e as { status?: number }).status === 409 ? t("conflict") : t("generic") };
+  const status = (e as { status?: number }).status;
+  return { error: status === 409 ? t("conflict") : status === 502 ? t("deliveryFailed") : t("generic") };
 };
 
 /** Confirm a pending order: saves the tracking number and erases the customer's personal data. */
 export async function confirmOrderAction(id: string, _prev: FormState, form: FormData): Promise<FormState> {
   const token = await requireSession();
+  // With a delivery company set up the form sends no tracking number: the server creates the parcel itself.
+  const auto = form.get("auto") === "1";
   const tracking = String(form.get("trackingNumber") ?? "").trim();
-  if (!tracking) return { error: (await getTranslations("orders.errors"))("trackingRequired") };
+  if (!auto && !tracking) return { error: (await getTranslations("orders.errors"))("trackingRequired") };
   try {
-    await api.confirmOrder(token, id, { company: String(form.get("company") ?? "").trim() || "manual", trackingNumber: tracking }, await getLocale());
+    await api.confirmOrder(token, id, auto ? { company: "auto" } : { company: String(form.get("company") ?? "").trim() || "manual", trackingNumber: tracking }, await getLocale());
   } catch (e) {
     return fail(e);
   }
@@ -32,6 +35,11 @@ export async function setStatusAction(id: string, status: "shipped" | "delivered
   revalidatePath(`/orders/${id}`);
   revalidatePath("/orders");
   revalidatePath("/");
+}
+
+export async function refreshTrackingAction(id: string) {
+  await api.refreshTracking(await requireSession(), id);
+  revalidatePath(`/orders/${id}`);
 }
 
 // Notifications (polled from the browser through these actions: the token never leaves the server).

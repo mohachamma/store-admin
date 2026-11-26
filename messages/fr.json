@@ -217,10 +217,14 @@
     "errors": {
       "conflict": "Cette action n'est pas possible dans l'état actuel de la commande.",
       "generic": "Action impossible. Réessayez.",
-      "trackingRequired": "Le numéro de suivi est obligatoire."
+      "trackingRequired": "Le numéro de suivi est obligatoire.",
+      "deliveryFailed": "Le transporteur a refusé le colis. Vérifiez l'adresse du client ou réessayez. La commande reste en attente."
     },
     "prev": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "confirmAutoHint": "Le serveur envoie le colis à {company} automatiquement et enregistre le numéro de suivi, puis les données personnelles du client sont supprimées définitivement.",
+    "deliveryStatus": "Statut du colis",
+    "refreshTracking": "Actualiser le statut"
   },
   "notifications": {
     "title": "Notifications",
@@ -422,5 +426,14 @@
     "scheduled": "Programmée",
     "imageRequired": "L'image est obligatoire.",
     "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
+  },
+  "delivery": {
+    "title": "Société de livraison",
+    "hint": "Choisissez la société à laquelle envoyer les commandes. À la confirmation, le serveur lui envoie le colis, enregistre le numéro de suivi puis supprime les données du client. Modifiable à tout moment (les colis déjà envoyés restent chez leur société).",
+    "manual": "Manuel (je saisis le numéro de suivi)",
+    "noKeys": "Les clés de cette société ne sont pas encore ajoutées au serveur",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "error": "Échec de l'enregistrement."
   }
 }
