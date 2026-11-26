@@ -10,7 +10,11 @@ async function call<R>(path: string, init: RequestInit & { token?: string } = {}
     cache: "no-store",
     headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...headers },
   });
-  if (!res.ok) throw Object.assign(new Error(`API ${res.status} on ${path}`), { status: res.status });
+  if (!res.ok) {
+    // Keep the API's own error code/message so the dashboard can explain what was refused.
+    const body = (await res.json().catch(() => null)) as { error?: { code?: string; message?: string; details?: unknown } } | null;
+    throw Object.assign(new Error(body?.error?.message ?? `API ${res.status} on ${path}`), { status: res.status, code: body?.error?.code, details: body?.error?.details });
+  }
   return (await res.json()) as R;
 }
 
@@ -41,6 +45,37 @@ export const realApi: AdminApi = {
   setOrderStatus: (token, id, status, locale) => call(`/admin/orders/${id}/status?locale=${locale}`, { token, method: "POST", body: JSON.stringify({ status }) }),
   getEvents: (token) => call("/admin/events", { token }),
   markEventsRead: async (token) => void (await call("/admin/events/read", { token, method: "POST" })),
+
+  listProducts: (token, f, locale) => {
+    const q = new URLSearchParams({ locale });
+    if (f.q) q.set("q", f.q);
+    if (f.status) q.set("status", f.status);
+    if (f.categoryId) q.set("categoryId", f.categoryId);
+    if (f.limit) q.set("limit", String(f.limit));
+    if (f.offset) q.set("offset", String(f.offset));
+    return call(`/admin/products?${q}`, { token });
+  },
+  getProduct: (token, id) => call(`/admin/products/${id}`, { token }),
+  saveProduct: (token, id, input) => call(id ? `/admin/products/${id}` : "/admin/products", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteProduct: async (token, id) => void (await call(`/admin/products/${id}`, { token, method: "DELETE" })),
+  publishProducts: async (token, ids, isPublished) => (await call<{ updated: number }>("/admin/products/publish", { token, method: "POST", body: JSON.stringify({ ids, isPublished }) })).updated,
+  listCategories: (token) => call("/admin/categories", { token }),
+  saveCategory: (token, id, input) => call(id ? `/admin/categories/${id}` : "/admin/categories", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteCategory: async (token, id) => void (await call(`/admin/categories/${id}`, { token, method: "DELETE" })),
+  moveCategory: async (token, id, direction) => void (await call(`/admin/categories/${id}/move`, { token, method: "POST", body: JSON.stringify({ direction }) })),
+  listCollections: (token) => call("/admin/collections", { token }),
+  saveCollection: (token, id, input) => call(id ? `/admin/collections/${id}` : "/admin/collections", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteCollection: async (token, id) => void (await call(`/admin/collections/${id}`, { token, method: "DELETE" })),
+  moveCollection: async (token, id, direction) => void (await call(`/admin/collections/${id}/move`, { token, method: "POST", body: JSON.stringify({ direction }) })),
+  listVariants: (token, f, locale) => {
+    const q = new URLSearchParams({ locale });
+    if (f.q) q.set("q", f.q);
+    if (f.lowStock) q.set("lowStock", "true");
+    if (f.limit) q.set("limit", String(f.limit));
+    if (f.offset) q.set("offset", String(f.offset));
+    return call(`/admin/variants?${q}`, { token });
+  },
+  bulkUpdateVariants: async (token, updates) => (await call<{ updated: number }>("/admin/variants/bulk", { token, method: "POST", body: JSON.stringify({ updates }) })).updated,
 
   listBrands: (token) => call("/admin/brands", { token }),
   saveBrand: (token, b) =>

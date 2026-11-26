@@ -24,6 +24,38 @@ export type AdminOrderDetail = S["AdminOrderDetail"];
 export type AdminEvents = S["AdminEvents"];
 export type OrderStatus = AdminOrderRow["status"];
 
+export type AdminProduct = S["AdminProduct"];
+export type AdminProductRow = S["AdminProductRow"];
+export type AdminProductList = S["AdminProductList"];
+export type ProductInput = S["ProductInput"];
+export type VariantInput = S["VariantInput"];
+export type AdminCategory = S["AdminCategory"];
+export type CategoryInput = S["CategoryInput"];
+export type AdminCollection = S["AdminCollection"];
+export type CollectionInput = S["CollectionInput"];
+export type AdminVariantRow = S["AdminVariantRow"];
+export type AdminVariantList = S["AdminVariantList"];
+
+export interface ProductFilters {
+  q?: string;
+  status?: "published" | "draft";
+  categoryId?: string;
+  limit?: number;
+  offset?: number;
+}
+export interface VariantFilters {
+  q?: string;
+  lowStock?: boolean;
+  limit?: number;
+  offset?: number;
+}
+export interface BulkVariantUpdate {
+  variantId: string;
+  price?: number;
+  compareAtPrice?: number | null;
+  stock?: number;
+}
+
 export interface OrderFilters {
   status?: OrderStatus;
   /** Order number or tracking number. */
@@ -41,6 +73,23 @@ export interface AdminApi {
   /** Stores the tracking number and erases the customer's personal data. */
   confirmOrder(token: string, id: string, input: { company: string; trackingNumber: string }, locale: string): Promise<AdminOrderDetail>;
   setOrderStatus(token: string, id: string, status: "shipped" | "delivered" | "returned" | "cancelled", locale: string): Promise<AdminOrderDetail>;
+  listProducts(token: string, filters: ProductFilters, locale: string): Promise<AdminProductList>;
+  getProduct(token: string, id: string): Promise<AdminProduct>;
+  /** id = null creates; otherwise edits (images and variants are synchronised with the given lists). */
+  saveProduct(token: string, id: string | null, input: ProductInput): Promise<AdminProduct>;
+  deleteProduct(token: string, id: string): Promise<void>;
+  publishProducts(token: string, ids: string[], isPublished: boolean): Promise<number>;
+  listCategories(token: string): Promise<AdminCategory[]>;
+  saveCategory(token: string, id: string | null, input: CategoryInput): Promise<AdminCategory>;
+  deleteCategory(token: string, id: string): Promise<void>;
+  moveCategory(token: string, id: string, direction: -1 | 1): Promise<void>;
+  listCollections(token: string): Promise<AdminCollection[]>;
+  saveCollection(token: string, id: string | null, input: CollectionInput): Promise<AdminCollection>;
+  deleteCollection(token: string, id: string): Promise<void>;
+  moveCollection(token: string, id: string, direction: -1 | 1): Promise<void>;
+  listVariants(token: string, filters: VariantFilters, locale: string): Promise<AdminVariantList>;
+  bulkUpdateVariants(token: string, updates: BulkVariantUpdate[]): Promise<number>;
+
   getEvents(token: string): Promise<AdminEvents>;
   markEventsRead(token: string): Promise<void>;
 
