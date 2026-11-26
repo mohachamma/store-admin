@@ -26,7 +26,14 @@ export const realApi: AdminApi = {
       throw e;
     }
   },
-  getOverview: (token) => call<Overview>("/admin/stats/overview", { token }),
+  async getOverview(token) {
+    try {
+      return await call<Overview>("/admin/stats/overview", { token });
+    } catch (e) {
+      if ((e as { status?: number }).status === 404) return null; // statistics endpoint not built yet
+      throw e;
+    }
+  },
 
   listBrands: (token) => call("/admin/brands", { token }),
   saveBrand: (token, b) =>
@@ -40,6 +47,9 @@ export const realApi: AdminApi = {
   saveOffer: (token, o) =>
     o.id ? call(`/admin/offers/${o.id}`, { token, method: "PUT", body: JSON.stringify(o) }) : call("/admin/offers", { token, method: "POST", body: JSON.stringify(o) }),
   deleteOffer: async (token, id) => void (await call(`/admin/offers/${id}`, { token, method: "DELETE" })),
+
+  getSalePage: (token) => call("/admin/sale-page", { token }),
+  saveSalePage: async (token, s) => void (await call("/admin/sale-page", { token, method: "PUT", body: JSON.stringify(s) })),
 
   getSiteContent: (token) => call("/admin/site", { token }),
   saveSiteContent: async (token, c) => void (await call("/admin/site", { token, method: "PUT", body: JSON.stringify(c) })),

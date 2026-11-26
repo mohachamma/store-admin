@@ -61,6 +61,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 ## Progress
 - [x] Phase 1 — setup: Next.js 16 + Tailwind 4 + shadcn/ui (button, input, label, card, badge, sheet, skeleton — written by hand, `components.json` ready) + next-intl (ar/fr via cookie), brand identity shared with the storefront (wordmark + black ADMIN tag), login page (server action, httpOnly cookie), protected layout (`src/proxy.ts` + `requireSession`), sidebar (desktop) / bottom bar + "More" sheet (mobile), mock API adapter, `gen:api`, noindex
 - [x] Storefront content screens (mock, in-memory): **Brands** (add/edit/delete/hide/reorder brands + brands-strip settings: show, animation on/off, speed, pause on hover, title; live preview), **Offers & sales** (banners with ar/fr/en texts, image, dark/light, button + link, schedule, countdown, status), **Content** (announcement bar text with preview)
+- [x] **Connected to the real API** (2026-11-26): generated types (`npm run gen:api`), brands / strip / offers / sale page / announcement / uploads all work against store-api; the overview page shows a notice until `/admin/stats/overview` exists. Use `NEXT_PUBLIC_API_URL` + `NEXT_PUBLIC_USE_MOCK=false`. Local demo login with the API's `npm run dev:local`: `admin@store.test` / `admin1234`.
 - [~] Phase 2 — overview page done on mock data (revenue today/week/month, new orders, orders by status, top products, low stock); orders list/detail next
 
 ## Needs from API
@@ -69,7 +70,7 @@ Temporary shapes are in `src/lib/api/types.ts`.
 - `GET/PUT /admin/brands-strip` — `{ enabled, animated, speed (5–120 s per loop), pauseOnHover, title: {ar,fr,en} }`
 - `GET/POST /admin/offers`, `PUT/DELETE /admin/offers/{id}` — `AdminOffer { id, label, title, subtitle, ctaLabel: {ar,fr,en}, href, imageUrl, theme: "dark"|"light", showCountdown, startsAt, endsAt (ISO), isActive }` (DB table `offers` already exists; countdown requires `endsAt`)
 - `GET/PUT /admin/site` — `{ announcement: {ar,fr,en} }` (empty hides the bar)
-- `GET/PUT /admin/sale-page` — `{ enabled, title: {ar,fr,en}, subtitle: {ar,fr,en} }` (UI to be added; stored in setting `sale_page`)
+- `GET/PUT /admin/sale-page` — `{ enabled, title: {ar,fr,en}, subtitle: {ar,fr,en} }` (**done**, screen on the Offers page)
 - `POST /admin/uploads` (multipart `file`; PNG/JPEG/WebP/GIF ≤ 3 MB, **no SVG**) → `{ url }` (Cloudflare R2). The dashboard resizes and converts every picked image to WebP in the browser first (`src/lib/image-optimize.ts`, used by `ImageField`): logos ≤ 600 px, offer/banner ≤ 1400 px, product photos ≤ 1600 px.
 - `POST /auth/login` `{ email, password }` → `{ accessToken, expiresIn, user: { id, email, role } }`; 401 on bad credentials, 403 if role ≠ `admin` (or return the role and the dashboard refuses).
 - `GET /admin/stats/overview` → `{ newOrdersToday, revenue: { today, week, month }, revenueLast7Days: number[7], ordersByStatus: { pending, confirmed, shipped, delivered, cancelled, returned }, topProducts: [{ id, name, image, unitsSold, revenue }], lowStock: [{ variantId, productName, size, stock, image }] }` (integer DZD).

@@ -50,7 +50,8 @@
     "outOfStock": "Épuisé",
     "size": "Taille {size}",
     "viewAll": "Tout voir",
-    "pendingHint": "{count} à confirmer"
+    "pendingHint": "{count} à confirmer",
+    "unavailable": "Les statistiques (revenus, meilleures ventes, stock faible) apparaîtront ici quand l'API aura le module des commandes (phase 5)."
   },
   "status": {
     "pending": "En attente",
@@ -151,7 +152,9 @@
     "salePageHint": "Affiche automatiquement les produits dont le prix est inférieur au prix barré. Modifiez les prix dans Produits.",
     "salePageEnabled": "Afficher la page Promotions",
     "saleTitle": "Titre de la page",
-    "saleSubtitle": "Courte description"
+    "saleSubtitle": "Courte description",
+    "saveSale": "Enregistrer",
+    "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
   },
   "content": {
     "title": "Contenu de la boutique",

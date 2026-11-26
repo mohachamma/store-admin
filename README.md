@@ -13,6 +13,7 @@ npm run dev        # http://localhost:3001 — demo login (mock mode): admin@sto
 | `npm run build` / `npm run lint` | Run both before every push |
 | `npm run gen:api` | Regenerate `src/lib/api/schema.d.ts` from `${NEXT_PUBLIC_API_URL}/openapi.json` |
 
+- Real API locally: run `npm run dev:local` in `store-api`, then set `NEXT_PUBLIC_API_URL=http://localhost:8787` and `NEXT_PUBLIC_USE_MOCK=false` (login `admin@store.test` / `admin1234`).
 - Identity: same tokens as the storefront (`src/config/brand.ts`, `src/app/globals.css`) + black **ADMIN** tag next to the wordmark.
 - Auth: `src/proxy.ts` redirects to `/login` without a session; `requireSession()` re-checks on the server. The API token lives only in an httpOnly cookie.
 - `noindex` everywhere: page metadata, `X-Robots-Tag` header, `robots.txt`.

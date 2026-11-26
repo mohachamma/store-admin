@@ -16,6 +16,11 @@ export async function saveOfferAction(_prev: FormState, form: FormData): Promise
 
   const title = readI18n(form, "title");
   if (!title.ar) return { error: t("titleRequired") };
+  // Each optional text needs an Arabic version when another language is filled (the API enforces it too).
+  for (const f of ["label", "subtitle", "ctaLabel"]) {
+    const v = readI18n(form, f);
+    if ((v.fr || v.en) && !v.ar) return { error: t("arabicNeeded") };
+  }
   const startsAt = String(form.get("startsAt") ?? "") || null;
   const endsAt = String(form.get("endsAt") ?? "") || null;
   const showCountdown = form.get("showCountdown") === "on";
