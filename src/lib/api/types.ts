@@ -41,6 +41,7 @@ export type AdminWilaya = S["AdminWilaya"];
 export type AdminDiscountCode = S["AdminDiscountCode"];
 export type DiscountCodeInput = S["DiscountCodeInput"];
 export type AdminSlide = S["AdminSlide"];
+export type AdminDelivery = S["AdminDelivery"];
 export type SlideInput = S["SlideInput"];
 export interface WilayaUpdate {
   code: number;
@@ -84,7 +85,7 @@ export interface AdminApi {
   listOrders(token: string, filters: OrderFilters, locale: string): Promise<AdminOrderList>;
   getOrder(token: string, id: string, locale: string): Promise<AdminOrderDetail>;
   /** Stores the tracking number and erases the customer's personal data. */
-  confirmOrder(token: string, id: string, input: { company: string; trackingNumber: string }, locale: string): Promise<AdminOrderDetail>;
+  confirmOrder(token: string, id: string, input: { company: string; trackingNumber?: string }, locale: string): Promise<AdminOrderDetail>;
   setOrderStatus(token: string, id: string, status: "shipped" | "delivered" | "returned" | "cancelled", locale: string): Promise<AdminOrderDetail>;
   listProducts(token: string, filters: ProductFilters, locale: string): Promise<AdminProductList>;
   getProduct(token: string, id: string): Promise<AdminProduct>;
@@ -106,6 +107,9 @@ export interface AdminApi {
   getShipping(token: string): Promise<AdminShipping>;
   updateWilayas(token: string, updates: WilayaUpdate[]): Promise<number>;
   setFreeShipping(token: string, over: number | null): Promise<void>;
+  getDelivery(token: string): Promise<AdminDelivery>;
+  setDelivery(token: string, provider: string): Promise<AdminDelivery>;
+  refreshTracking(token: string, id: string): Promise<string>;
   listDiscountCodes(token: string): Promise<AdminDiscountCode[]>;
   saveDiscountCode(token: string, id: string | null, input: DiscountCodeInput): Promise<AdminDiscountCode>;
   deleteDiscountCode(token: string, id: string): Promise<void>;

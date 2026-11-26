@@ -34,6 +34,7 @@ interface MockDb {
   categories: Omit<AdminCategory, "productCount">[];
   collections: AdminCollection[];
   wilayas: AdminWilaya[];
+  deliveryProvider: string;
   freeShippingOver: number | null;
   codes: AdminDiscountCode[];
   slides: AdminSlide[];
@@ -70,6 +71,7 @@ const db = (): MockDb =>
     ],
     orders: sampleOrders(),
     ...sampleCatalog(),
+    deliveryProvider: "manual",
     wilayas: [
       [16, "الجزائر", "Alger", 500, 350], [31, "وهران", "Oran", 700, 450], [25, "قسنطينة", "Constantine", 700, 450], [9, "البليدة", "Blida", 500, 350], [19, "سطيف", "Sétif", 800, 550], [30, "ورقلة", "Ouargla", 1200, 800],
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
@@ -176,7 +178,9 @@ export const mockApi: AdminApi = {
   async confirmOrder(_t, id, input) {
     const o = orderById(id);
     if (o.status !== "pending") throw Object.assign(new Error("not pending"), { status: 409 });
-    Object.assign(o, { status: "confirmed", deliveryCompany: input.company, trackingNumber: input.trackingNumber, deliveryStatus: "created", confirmedAt: new Date().toISOString(), contact: null, customerName: null, customerPhone: null });
+    const auto = db().deliveryProvider !== "manual" && !input.trackingNumber;
+    if (!auto && !input.trackingNumber) throw Object.assign(new Error("tracking required"), { status: 422 });
+    Object.assign(o, { status: "confirmed", deliveryCompany: auto ? db().deliveryProvider : input.company, trackingNumber: auto ? `YAL-MOCK-${o.orderNumber}` : input.trackingNumber, deliveryStatus: "created", confirmedAt: new Date().toISOString(), contact: null, customerName: null, customerPhone: null });
     return detailOf(o);
   },
   async setOrderStatus(_t, id, status) {
@@ -322,6 +326,19 @@ export const mockApi: AdminApi = {
       Object.assign(w, { ...(u.homeFee !== undefined && { homeFee: u.homeFee }), ...(u.deskFee !== undefined && { deskFee: u.deskFee }), ...(u.active !== undefined && { active: u.active }) });
     }
     return updates.length;
+  },
+  async getDelivery() {
+    return { provider: db().deliveryProvider, providers: [{ id: "manual", name: "Manual", configured: true }, { id: "yalidine", name: "Yalidine", configured: true }] };
+  },
+  async setDelivery(_t, provider) {
+    if (!["manual", "yalidine"].includes(provider)) throw Object.assign(new Error("unknown"), { status: 422 });
+    db().deliveryProvider = provider;
+    return this.getDelivery("");
+  },
+  async refreshTracking(_t, id) {
+    const o = orderById(id);
+    o.deliveryStatus = "in_transit";
+    return "in_transit";
   },
   async setFreeShipping(_t, over) {
     db().freeShippingOver = over;

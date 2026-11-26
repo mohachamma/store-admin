@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
+import { DeliveryCompanyForm } from "./DeliveryCompanyForm";
 import { FreeShippingForm } from "./FreeShippingForm";
 import { ShippingTable } from "./ShippingTable";
 
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ShippingPage() {
   const token = await requireSession();
-  const [t, data] = await Promise.all([getTranslations("shipping"), api.getShipping(token)]);
+  const [t, td, data, delivery] = await Promise.all([getTranslations("shipping"), getTranslations("delivery"), api.getShipping(token), api.getDelivery(token)]);
   return (
     <div className="space-y-6">
       <div>
@@ -28,6 +29,13 @@ export default async function ShippingPage() {
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground">{t("freeHint")}</p>
           <FreeShippingForm value={data.freeShippingOver} />
+        </CardContent>
+      </Card>
+      <Card className="max-w-2xl">
+        <CardHeader><CardTitle>{td("title")}</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">{td("hint")}</p>
+          <DeliveryCompanyForm delivery={delivery} />
         </CardContent>
       </Card>
       <div className="space-y-3">
