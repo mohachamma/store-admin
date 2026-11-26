@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminOffer, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -33,6 +33,10 @@ interface MockDb {
   products: AdminProduct[];
   categories: Omit<AdminCategory, "productCount">[];
   collections: AdminCollection[];
+  wilayas: AdminWilaya[];
+  freeShippingOver: number | null;
+  codes: AdminDiscountCode[];
+  slides: AdminSlide[];
 }
 /** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
 type MockOrder = AdminOrderRow & {
@@ -66,6 +70,12 @@ const db = (): MockDb =>
     ],
     orders: sampleOrders(),
     ...sampleCatalog(),
+    wilayas: [
+      [16, "الجزائر", "Alger", 500, 350], [31, "وهران", "Oran", 700, 450], [25, "قسنطينة", "Constantine", 700, 450], [9, "البليدة", "Blida", 500, 350], [19, "سطيف", "Sétif", 800, 550], [30, "ورقلة", "Ouargla", 1200, 800],
+    ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
+    freeShippingOver: 10000,
+    codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
+    slides: [{ id: "sl_winter", title: { ar: "تشكيلة الشتاء", fr: "Collection hiver", en: "Winter Collection" }, subtitle: { ar: "قطع دافئة بخطوط بسيطة", fr: "", en: "" }, imageUrl: "/placeholders/hoodie-stone.svg", collectionId: "col_winter", linkUrl: null, isActive: true, startsAt: null, endsAt: null }],
     readEventIds: new Set<string>(),
     sale: {
       enabled: true,
@@ -300,6 +310,57 @@ export const mockApi: AdminApi = {
       if (u.stock !== undefined) v.stock = u.stock;
     }
     return updates.length;
+  },
+
+  async getShipping() {
+    return { freeShippingOver: db().freeShippingOver, wilayas: db().wilayas };
+  },
+  async updateWilayas(_t, updates) {
+    for (const u of updates) {
+      const w = db().wilayas.find((x) => x.code === u.code);
+      if (!w) throw fail(404, "Wilaya does not exist");
+      Object.assign(w, { ...(u.homeFee !== undefined && { homeFee: u.homeFee }), ...(u.deskFee !== undefined && { deskFee: u.deskFee }), ...(u.active !== undefined && { active: u.active }) });
+    }
+    return updates.length;
+  },
+  async setFreeShipping(_t, over) {
+    db().freeShippingOver = over;
+  },
+  async listDiscountCodes() {
+    return db().codes;
+  },
+  async saveDiscountCode(_t, id, input) {
+    const d = db();
+    const code = input.code.trim().toUpperCase();
+    if (d.codes.some((c) => c.code === code && c.id !== id)) throw fail(409, "This value already exists");
+    const base = { code, kind: input.kind, value: input.value, minSubtotal: input.minSubtotal ?? 0, maxUses: input.maxUses ?? null, startsAt: input.startsAt ?? null, endsAt: input.endsAt ?? null, isActive: input.isActive ?? true };
+    const existing = id ? d.codes.find((c) => c.id === id) : undefined;
+    if (id && !existing) throw fail(404, "Discount code not found");
+    const row = existing ? Object.assign(existing, base) : { id: newId("dc"), usedCount: 0, ...base };
+    if (!existing) d.codes.unshift(row);
+    return row;
+  },
+  async deleteDiscountCode(_t, id) {
+    db().codes = db().codes.filter((c) => c.id !== id);
+  },
+  async listSlides() {
+    return db().slides;
+  },
+  async saveSlide(_t, id, input) {
+    const d = db();
+    const t = (v?: { ar?: string; fr?: string; en?: string }) => ({ ar: v?.ar ?? "", fr: v?.fr ?? "", en: v?.en ?? "" });
+    const base = { title: t(input.title), subtitle: t(input.subtitle), imageUrl: input.imageUrl, collectionId: input.collectionId ?? null, linkUrl: input.linkUrl ?? null, isActive: input.isActive ?? true, startsAt: input.startsAt ?? null, endsAt: input.endsAt ?? null };
+    const existing = id ? d.slides.find((s) => s.id === id) : undefined;
+    if (id && !existing) throw fail(404, "Slide not found");
+    const row = existing ? Object.assign(existing, base) : { id: newId("sl"), ...base };
+    if (!existing) d.slides.push(row);
+    return row;
+  },
+  async deleteSlide(_t, id) {
+    db().slides = db().slides.filter((s) => s.id !== id);
+  },
+  async moveSlide(_t, id, direction) {
+    move(db().slides, id, direction);
   },
 
   async listBrands() {
