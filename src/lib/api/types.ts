@@ -42,6 +42,11 @@ export type AdminDiscountCode = S["AdminDiscountCode"];
 export type DiscountCodeInput = S["DiscountCodeInput"];
 export type AdminSlide = S["AdminSlide"];
 export type AdminDelivery = S["AdminDelivery"];
+export type AdminWhyUs = S["AdminWhyUs"];
+export type AdminHomeCard = S["AdminHomeCard"];
+export type HomeCardInput = S["HomeCardInput"];
+export type AdminNewsletter = S["AdminNewsletter"];
+export type NewsletterSubscribers = S["NewsletterSubscribers"];
 export type SlideInput = S["SlideInput"];
 export interface WilayaUpdate {
   code: number;
@@ -117,6 +122,17 @@ export interface AdminApi {
   saveSlide(token: string, id: string | null, input: SlideInput): Promise<AdminSlide>;
   deleteSlide(token: string, id: string): Promise<void>;
   moveSlide(token: string, id: string, direction: -1 | 1): Promise<void>;
+
+  getWhyUs(token: string): Promise<AdminWhyUs>;
+  saveWhyUs(token: string, input: AdminWhyUs): Promise<void>;
+  listHomeCards(token: string): Promise<AdminHomeCard[]>;
+  saveHomeCard(token: string, id: string | null, input: HomeCardInput): Promise<AdminHomeCard>;
+  deleteHomeCard(token: string, id: string): Promise<void>;
+  moveHomeCard(token: string, id: string, direction: -1 | 1): Promise<void>;
+  getNewsletter(token: string): Promise<AdminNewsletter>;
+  saveNewsletter(token: string, input: AdminNewsletter): Promise<void>;
+  listSubscribers(token: string): Promise<NewsletterSubscribers>;
+  deleteSubscriber(token: string, id: string): Promise<void>;
 
   getEvents(token: string): Promise<AdminEvents>;
   markEventsRead(token: string): Promise<void>;

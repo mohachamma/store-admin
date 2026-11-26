@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
 import { AnnouncementForm } from "./AnnouncementForm";
+import { HomeSections } from "./HomeSections";
 import { SlidesSection } from "./SlidesSection";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,6 +26,7 @@ export default async function ContentPage() {
         </CardContent>
       </Card>
       <SlidesSection token={token} />
+      <HomeSections token={token} />
     </div>
   );
 }
