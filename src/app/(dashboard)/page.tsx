@@ -33,6 +33,14 @@ export default async function OverviewPage() {
     getLocale() as Promise<Locale>,
     api.getOverview(token),
   ]);
+  if (!data) {
+    return (
+      <div className="space-y-4">
+        <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
+        <p className="rounded-[var(--radius-card)] border border-dashed border-border px-6 py-14 text-center text-sm text-muted-foreground">{t("unavailable")}</p>
+      </div>
+    );
+  }
   const totalOrders = statusOrder.reduce((n, s) => n + data.ordersByStatus[s], 0);
   const money = (n: number) => formatDZD(n, locale);
 

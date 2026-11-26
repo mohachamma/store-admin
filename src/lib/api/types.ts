@@ -1,22 +1,25 @@
 /**
- * TEMPORARY types for the mock adapter, until store-api publishes /admin/* endpoints.
- * Then run `npm run gen:api` and alias these to `components["schemas"][...]` in ./schema.d.ts.
- * The shapes are listed under "Needs from API" in CLAUDE.md.
+ * API types come from store-api's OpenAPI document (`npm run gen:api` → ./schema.d.ts).
+ * Never hand-write API shapes: re-export the generated ones. The only exception is `Overview` below,
+ * because `GET /admin/stats/overview` does not exist in the API yet (phase 5).
  */
+import type { components } from "./schema";
+
+type S = components["schemas"];
+
+/** A translatable text: Arabic is required, French/English fall back to it when empty. */
+export type I18n = S["OptionalI18n"];
+export type AdminBrand = S["AdminBrand"];
+export type BrandInput = Omit<AdminBrand, "id"> & { id?: string };
+export type BrandsStripSettings = S["BrandsStripSettings"];
+export type AdminOffer = S["AdminOffer"];
+export type OfferInput = Omit<AdminOffer, "id"> & { id?: string };
+export type SiteContent = S["SiteContent"];
+export type SalePageSettings = S["SalePageSettings"];
+export type LoginResult = S["LoginResult"];
+
+// --- Temporary (no API endpoint yet) -------------------------------------------------------------
 export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "returned";
-
-export interface AdminUser {
-  id: string;
-  email: string;
-  role: "admin";
-}
-
-export interface LoginResult {
-  accessToken: string;
-  /** Seconds. */
-  expiresIn: number;
-  user: AdminUser;
-}
 
 export interface Overview {
   newOrdersToday: number;
@@ -29,58 +32,10 @@ export interface Overview {
   lowStock: { variantId: string; productName: string; size: string; stock: number; image: string }[];
 }
 
-/** A translatable text: Arabic is required, French/English fall back to it when empty. */
-export interface I18n {
-  ar: string;
-  fr: string;
-  en: string;
-}
-
-export interface AdminBrand {
-  id: string;
-  name: string;
-  logoUrl: string | null;
-  href: string | null;
-  isActive: boolean;
-}
-export type BrandInput = Omit<AdminBrand, "id"> & { id?: string };
-
-/** How the storefront's brands strip behaves. */
-export interface BrandsStripSettings {
-  enabled: boolean;
-  animated: boolean;
-  /** Seconds per full loop (higher = slower). */
-  speed: number;
-  pauseOnHover: boolean;
-  title: I18n;
-}
-
-export interface AdminOffer {
-  id: string;
-  label: I18n;
-  title: I18n;
-  subtitle: I18n;
-  ctaLabel: I18n;
-  href: string | null;
-  imageUrl: string | null;
-  theme: "dark" | "light";
-  /** Show a live countdown to endsAt. */
-  showCountdown: boolean;
-  /** ISO strings (UTC) or null. */
-  startsAt: string | null;
-  endsAt: string | null;
-  isActive: boolean;
-}
-export type OfferInput = Omit<AdminOffer, "id"> & { id?: string };
-
-export interface SiteContent {
-  /** Text of the thin bar above the storefront header; empty hides it. */
-  announcement: I18n;
-}
-
 export interface AdminApi {
   login(email: string, password: string): Promise<LoginResult | "invalid" | "forbidden">;
-  getOverview(token: string): Promise<Overview>;
+  /** null when the API has no statistics endpoint yet. */
+  getOverview(token: string): Promise<Overview | null>;
 
   listBrands(token: string): Promise<AdminBrand[]>;
   saveBrand(token: string, input: BrandInput): Promise<AdminBrand>;
@@ -93,6 +48,9 @@ export interface AdminApi {
   listOffers(token: string): Promise<AdminOffer[]>;
   saveOffer(token: string, input: OfferInput): Promise<AdminOffer>;
   deleteOffer(token: string, id: string): Promise<void>;
+
+  getSalePage(token: string): Promise<SalePageSettings>;
+  saveSalePage(token: string, settings: SalePageSettings): Promise<void>;
 
   getSiteContent(token: string): Promise<SiteContent>;
   saveSiteContent(token: string, content: SiteContent): Promise<void>;

@@ -12,6 +12,7 @@ import { withStatus, type OfferStatus } from "@/lib/offers";
 import { cn } from "@/lib/utils";
 import { deleteOfferAction, saveOfferAction } from "./actions";
 import { OfferForm } from "./OfferForm";
+import { SalePageForm } from "./SalePageForm";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("offers"))("title") };
@@ -26,7 +27,7 @@ const statusVariant: Record<OfferStatus, "success" | "info" | "secondary" | "war
 
 export default async function OffersPage() {
   const token = await requireSession();
-  const [t, locale, raw] = await Promise.all([getTranslations("offers"), getLocale() as Promise<"ar" | "fr">, api.listOffers(token)]);
+  const [t, locale, raw, sale] = await Promise.all([getTranslations("offers"), getLocale() as Promise<"ar" | "fr">, api.listOffers(token), api.getSalePage(token)]);
   const offers = withStatus(raw);
   const fmt = (iso: string) => new Intl.DateTimeFormat(locale === "ar" ? "ar-DZ-u-nu-latn" : "fr-DZ", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
   const round = "grid size-9 place-items-center rounded-full transition hover:bg-secondary";
@@ -86,10 +87,13 @@ export default async function OffersPage() {
         </ul>
       )}
 
-      <Card>
-        <CardContent className="space-y-1">
-          <h2 className="label">{t("salePageTitle")}</h2>
-          <p className="text-sm text-muted-foreground">{t("salePageHint")}</p>
+      <Card className="max-w-2xl">
+        <CardContent className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="label">{t("salePageTitle")}</h2>
+            <p className="text-sm text-muted-foreground">{t("salePageHint")}</p>
+          </div>
+          <SalePageForm settings={sale} />
         </CardContent>
       </Card>
     </div>

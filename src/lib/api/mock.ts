@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminOffer, BrandsStripSettings, Overview, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminOffer, BrandsStripSettings, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -27,6 +27,7 @@ interface MockDb {
   strip: BrandsStripSettings;
   offers: AdminOffer[];
   site: SiteContent;
+  sale: SalePageSettings;
 }
 const g = globalThis as unknown as { __mockDb?: MockDb };
 const db = (): MockDb =>
@@ -52,6 +53,11 @@ const db = (): MockDb =>
         isActive: true,
       },
     ],
+    sale: {
+      enabled: true,
+      title: { ar: "التخفيضات", fr: "Promotions", en: "Sale" },
+      subtitle: { ar: "أفضل العروض لفترة محدودة", fr: "Les meilleures offres, pour une durée limitée", en: "Our best deals, for a limited time" },
+    },
     site: {
       announcement: {
         ar: "توصيل مجاني ابتداءً من 10,000 دج · الدفع عند الاستلام في 58 ولاية",
@@ -105,6 +111,13 @@ export const mockApi: AdminApi = {
   },
   async deleteOffer(_t, id) {
     db().offers = db().offers.filter((o) => o.id !== id);
+  },
+
+  async getSalePage() {
+    return db().sale;
+  },
+  async saveSalePage(_t, settings) {
+    db().sale = settings;
   },
 
   async getSiteContent() {
