@@ -26,14 +26,21 @@ export const realApi: AdminApi = {
       throw e;
     }
   },
-  async getOverview(token) {
-    try {
-      return await call<Overview>("/admin/stats/overview", { token });
-    } catch (e) {
-      if ((e as { status?: number }).status === 404) return null; // statistics endpoint not built yet
-      throw e;
-    }
+  getOverview: (token, locale) => call<Overview>(`/admin/stats/overview?locale=${locale}`, { token }),
+
+  listOrders: (token, f, locale) => {
+    const q = new URLSearchParams({ locale });
+    if (f.status) q.set("status", f.status);
+    if (f.q) q.set("q", f.q);
+    if (f.limit) q.set("limit", String(f.limit));
+    if (f.offset) q.set("offset", String(f.offset));
+    return call(`/admin/orders?${q}`, { token });
   },
+  getOrder: (token, id, locale) => call(`/admin/orders/${id}?locale=${locale}`, { token }),
+  confirmOrder: (token, id, input, locale) => call(`/admin/orders/${id}/confirm?locale=${locale}`, { token, method: "POST", body: JSON.stringify(input) }),
+  setOrderStatus: (token, id, status, locale) => call(`/admin/orders/${id}/status?locale=${locale}`, { token, method: "POST", body: JSON.stringify({ status }) }),
+  getEvents: (token) => call("/admin/events", { token }),
+  markEventsRead: async (token) => void (await call("/admin/events/read", { token, method: "POST" })),
 
   listBrands: (token) => call("/admin/brands", { token }),
   saveBrand: (token, b) =>
