@@ -18,3 +18,5 @@ npm run dev        # http://localhost:3001 — demo login (mock mode): admin@sto
 - Auth: `src/proxy.ts` redirects to `/login` without a session; `requireSession()` re-checks on the server. The API token lives only in an httpOnly cookie.
 - `noindex` everywhere: page metadata, `X-Robots-Tag` header, `robots.txt`.
 - shadcn/ui: `components.json` is configured; `npx shadcn@latest add <component>` works where `ui.shadcn.com` is reachable.
+
+- Orders: with the local API (`npm run dev:local` in `store-api`) place an order on the storefront (`/checkout`), then handle it here under *Orders*. `store-api/scripts/e2e/orders.mjs` runs that whole journey in a browser.

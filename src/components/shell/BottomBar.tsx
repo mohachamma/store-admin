@@ -27,7 +27,7 @@ export function BottomBar() {
   return (
     <nav
       aria-label={t("menu")}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <div className="flex h-[var(--bottombar-h)] items-stretch px-2">
         {primary.map(({ key, href, icon: Icon }) => {

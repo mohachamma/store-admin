@@ -27,20 +27,8 @@ const statusColor: Record<OrderStatus, string> = {
 
 export default async function OverviewPage() {
   const token = await requireSession();
-  const [t, ts, locale, data] = await Promise.all([
-    getTranslations("overview"),
-    getTranslations("status"),
-    getLocale() as Promise<Locale>,
-    api.getOverview(token),
-  ]);
-  if (!data) {
-    return (
-      <div className="space-y-4">
-        <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
-        <p className="rounded-[var(--radius-card)] border border-dashed border-border px-6 py-14 text-center text-sm text-muted-foreground">{t("unavailable")}</p>
-      </div>
-    );
-  }
+  const locale = (await getLocale()) as Locale;
+  const [t, ts, data] = await Promise.all([getTranslations("overview"), getTranslations("status"), api.getOverview(token, locale)]);
   const totalOrders = statusOrder.reduce((n, s) => n + data.ordersByStatus[s], 0);
   const money = (n: number) => formatDZD(n, locale);
 

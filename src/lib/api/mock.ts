@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminOffer, BrandsStripSettings, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminOffer, AdminOrderDetail, AdminOrderRow, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -28,7 +28,15 @@ interface MockDb {
   offers: AdminOffer[];
   site: SiteContent;
   sale: SalePageSettings;
+  orders: MockOrder[];
+  readEventIds: Set<string>;
 }
+/** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
+type MockOrder = AdminOrderRow & {
+  subtotal: number; shippingFee: number; discountTotal: number; discountCode: string | null; deliveryCompany: string | null; deliveryStatus: string | null; confirmedAt: string | null;
+  items: AdminOrderDetail["items"]; contact: { name: string; phone: string; commune: string; daira: string | null; address: string } | null;
+};
+
 const g = globalThis as unknown as { __mockDb?: MockDb };
 const db = (): MockDb =>
   (g.__mockDb ??= {
@@ -53,6 +61,8 @@ const db = (): MockDb =>
         isActive: true,
       },
     ],
+    orders: sampleOrders(),
+    readEventIds: new Set<string>(),
     sale: {
       enabled: true,
       title: { ar: "التخفيضات", fr: "Promotions", en: "Sale" },
@@ -67,9 +77,83 @@ const db = (): MockDb =>
     },
   });
 
+function sampleOrders(): MockOrder[] {
+  const item = (name: string, size: string, unitPrice: number, quantity = 1) => ({ id: `i_${Math.random().toString(36).slice(2, 8)}`, name, size, color: "", unitPrice, quantity, lineTotal: unitPrice * quantity });
+  const mk = (n: number, status: OrderStatus, hoursAgo: number, wilayaCode: number, wilaya: string, fee: number, items: ReturnType<typeof item>[], who?: { name: string; phone: string; commune: string; address: string }): MockOrder => {
+    const subtotal = items.reduce((t, i) => t + i.lineTotal, 0);
+    const pending = status === "pending";
+    return {
+      id: `o_${n}`, orderNumber: n, status, paymentMethod: "cod", paymentStatus: status === "delivered" ? "paid" : "unpaid", deliveryType: "home", wilayaCode, wilaya,
+      total: subtotal + fee, itemCount: items.reduce((t, i) => t + i.quantity, 0), trackingNumber: pending ? null : `YAL-${n * 7}`, createdAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
+      customerName: pending && who ? who.name : null, customerPhone: pending && who ? who.phone : null,
+      subtotal, shippingFee: fee, discountTotal: 0, discountCode: null, deliveryCompany: pending ? null : "yalidine", deliveryStatus: pending ? null : "created",
+      confirmedAt: pending ? null : new Date(Date.now() - (hoursAgo - 1) * 3600_000).toISOString(), items,
+      contact: pending && who ? { ...who, daira: null } : null,
+    };
+  };
+  return [
+    mk(1007, "pending", 0.5, 16, "الجزائر", 500, [item("Nylon Full Zip Hoodie", "M", 7900)], { name: "كريم بن علي", phone: "0550123456", commune: "عين بنيان", address: "12 شارع ديدوش مراد" }),
+    mk(1006, "pending", 3, 31, "وهران", 700, [item("Red Skate Mid Sneaker", "42", 9800), item("Heavy Tee Black", "L", 2400, 2)], { name: "سارة مرابط", phone: "0661987654", commune: "بئر الجير", address: "حي النصر، عمارة 4" }),
+    mk(1005, "confirmed", 20, 25, "قسنطينة", 700, [item("Slim Denim Jean", "S", 5400)]),
+    mk(1004, "shipped", 30, 16, "الجزائر", 500, [item("Hooded Deck Coat", "L", 12900)]),
+    mk(1003, "delivered", 50, 9, "البليدة", 500, [item("Henley Pullover", "M", 4200), item("Heavy Tee Cream", "M", 2400)]),
+    mk(1002, "cancelled", 70, 19, "سطيف", 800, [item("Chelsea Boot", "41", 11500)]),
+  ];
+}
+
 const newId = (p: string) => `${p}_${Math.random().toString(36).slice(2, 10)}`;
 
+const orderById = (id: string) => {
+  const o = db().orders.find((x) => x.id === id);
+  if (!o) throw Object.assign(new Error("not found"), { status: 404 });
+  return o;
+};
+const rowOf = (o: MockOrder): AdminOrderRow => ({
+  id: o.id, orderNumber: o.orderNumber, status: o.status, paymentMethod: o.paymentMethod, paymentStatus: o.paymentStatus, deliveryType: o.deliveryType, wilayaCode: o.wilayaCode,
+  wilaya: o.wilaya, total: o.total, itemCount: o.itemCount, trackingNumber: o.trackingNumber, createdAt: o.createdAt, customerName: o.customerName, customerPhone: o.customerPhone,
+});
+const detailOf = (o: MockOrder): AdminOrderDetail => ({
+  ...rowOf(o), subtotal: o.subtotal, shippingFee: o.shippingFee, discountTotal: o.discountTotal, discountCode: o.discountCode, deliveryCompany: o.deliveryCompany,
+  deliveryStatus: o.deliveryStatus, confirmedAt: o.confirmedAt, items: o.items,
+  customer: o.contact ? { ...o.contact, whatsappUrl: `https://wa.me/213${o.contact.phone.slice(1)}`, telUrl: `tel:${o.contact.phone}` } : null,
+});
+
 export const mockApi: AdminApi = {
+  async listOrders(_t, f) {
+    let rows = db().orders.filter((o) => !f.status || o.status === f.status);
+    if (f.q) rows = rows.filter((o) => String(o.orderNumber) === f.q!.replace(/^#/, "") || o.trackingNumber?.toLowerCase().includes(f.q!.toLowerCase()));
+    const items = rows.slice(f.offset ?? 0, (f.offset ?? 0) + (f.limit ?? 30)).map(rowOf);
+    return { items, total: rows.length };
+  },
+  async getOrder(_t, id) {
+    return detailOf(orderById(id));
+  },
+  async confirmOrder(_t, id, input) {
+    const o = orderById(id);
+    if (o.status !== "pending") throw Object.assign(new Error("not pending"), { status: 409 });
+    Object.assign(o, { status: "confirmed", deliveryCompany: input.company, trackingNumber: input.trackingNumber, deliveryStatus: "created", confirmedAt: new Date().toISOString(), contact: null, customerName: null, customerPhone: null });
+    return detailOf(o);
+  },
+  async setOrderStatus(_t, id, status) {
+    const o = orderById(id);
+    const allowed: Record<string, OrderStatus[]> = { shipped: ["confirmed"], delivered: ["shipped"], returned: ["shipped", "delivered"], cancelled: ["pending", "confirmed"] };
+    if (!allowed[status]!.includes(o.status)) throw Object.assign(new Error("invalid transition"), { status: 409 });
+    o.status = status;
+    if (status === "cancelled") Object.assign(o, { contact: null, customerName: null, customerPhone: null });
+    if (status === "delivered") o.paymentStatus = "paid";
+    if (status === "returned" && o.paymentStatus === "paid") o.paymentStatus = "refunded";
+    return detailOf(o);
+  },
+  async getEvents() {
+    const items = [...db().orders]
+      .filter((o) => o.status === "pending" || o.status === "confirmed")
+      .map((o, i) => ({ id: o.orderNumber, type: "order_created", orderId: o.id, orderNumber: o.orderNumber, total: o.total, createdAt: o.createdAt, read: db().readEventIds.has(o.id) || i > 1 }));
+    return { unreadCount: items.filter((e) => !e.read).length, items };
+  },
+  async markEventsRead() {
+    for (const o of db().orders) db().readEventIds.add(o.id);
+  },
+
   async listBrands() {
     return db().brands;
   },
@@ -138,6 +222,12 @@ export const mockApi: AdminApi = {
     return { accessToken: "mock-token", expiresIn: 60 * 60 * 8, user: { id: "u_mock", email: MOCK_CREDENTIALS.email, role: "admin" } };
   },
   async getOverview() {
-    return overview;
+    // Counts follow the in-memory orders, so confirming or cancelling in mock mode is reflected here.
+    const orders = db().orders;
+    const live = orders.filter((o) => o.status !== "cancelled" && o.status !== "returned");
+    const sum = live.reduce((n, o) => n + o.total, 0);
+    const byStatus = { pending: 0, confirmed: 0, shipped: 0, delivered: 0, cancelled: 0, returned: 0 };
+    for (const o of orders) byStatus[o.status]++;
+    return { ...overview, newOrdersToday: orders.length, revenue: { today: sum, week: sum, month: sum }, revenueLast7Days: [...overview.revenueLast7Days.slice(0, 6), sum], ordersByStatus: byStatus };
   },
 };

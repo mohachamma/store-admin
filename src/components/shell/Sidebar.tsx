@@ -15,7 +15,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-e border-border bg-background px-4 py-6 lg:flex">
+    <aside className="sticky top-0 hidden h-svh print:hidden w-64 shrink-0 flex-col border-e border-border bg-background px-4 py-6 lg:flex">
       <AdminLogo className="px-3" />
       <nav aria-label={t("menu")} className="mt-8 flex flex-1 flex-col gap-1">
         {navItems.map(({ key, href, icon: Icon }) => {
