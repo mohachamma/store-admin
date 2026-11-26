@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
 import { AnnouncementForm } from "./AnnouncementForm";
+import { SlidesSection } from "./SlidesSection";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("content"))("title") };
@@ -23,7 +24,7 @@ export default async function ContentPage() {
           <AnnouncementForm content={content} />
         </CardContent>
       </Card>
-      <p className="text-xs text-muted-foreground">{t("slidesSoon")}</p>
+      <SlidesSection token={token} />
     </div>
   );
 }

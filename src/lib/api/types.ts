@@ -36,6 +36,19 @@ export type CollectionInput = S["CollectionInput"];
 export type AdminVariantRow = S["AdminVariantRow"];
 export type AdminVariantList = S["AdminVariantList"];
 
+export type AdminShipping = S["AdminShipping"];
+export type AdminWilaya = S["AdminWilaya"];
+export type AdminDiscountCode = S["AdminDiscountCode"];
+export type DiscountCodeInput = S["DiscountCodeInput"];
+export type AdminSlide = S["AdminSlide"];
+export type SlideInput = S["SlideInput"];
+export interface WilayaUpdate {
+  code: number;
+  homeFee?: number;
+  deskFee?: number;
+  active?: boolean;
+}
+
 export interface ProductFilters {
   q?: string;
   status?: "published" | "draft";
@@ -89,6 +102,17 @@ export interface AdminApi {
   moveCollection(token: string, id: string, direction: -1 | 1): Promise<void>;
   listVariants(token: string, filters: VariantFilters, locale: string): Promise<AdminVariantList>;
   bulkUpdateVariants(token: string, updates: BulkVariantUpdate[]): Promise<number>;
+
+  getShipping(token: string): Promise<AdminShipping>;
+  updateWilayas(token: string, updates: WilayaUpdate[]): Promise<number>;
+  setFreeShipping(token: string, over: number | null): Promise<void>;
+  listDiscountCodes(token: string): Promise<AdminDiscountCode[]>;
+  saveDiscountCode(token: string, id: string | null, input: DiscountCodeInput): Promise<AdminDiscountCode>;
+  deleteDiscountCode(token: string, id: string): Promise<void>;
+  listSlides(token: string): Promise<AdminSlide[]>;
+  saveSlide(token: string, id: string | null, input: SlideInput): Promise<AdminSlide>;
+  deleteSlide(token: string, id: string): Promise<void>;
+  moveSlide(token: string, id: string, direction: -1 | 1): Promise<void>;
 
   getEvents(token: string): Promise<AdminEvents>;
   markEventsRead(token: string): Promise<void>;

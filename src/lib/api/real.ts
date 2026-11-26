@@ -77,6 +77,17 @@ export const realApi: AdminApi = {
   },
   bulkUpdateVariants: async (token, updates) => (await call<{ updated: number }>("/admin/variants/bulk", { token, method: "POST", body: JSON.stringify({ updates }) })).updated,
 
+  getShipping: (token) => call("/admin/shipping", { token }),
+  updateWilayas: async (token, updates) => (await call<{ updated: number }>("/admin/shipping/wilayas", { token, method: "PUT", body: JSON.stringify({ updates }) })).updated,
+  setFreeShipping: async (token, over) => void (await call("/admin/shipping/rules", { token, method: "PUT", body: JSON.stringify({ freeShippingOver: over }) })),
+  listDiscountCodes: (token) => call("/admin/discount-codes", { token }),
+  saveDiscountCode: (token, id, input) => call(id ? `/admin/discount-codes/${id}` : "/admin/discount-codes", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteDiscountCode: async (token, id) => void (await call(`/admin/discount-codes/${id}`, { token, method: "DELETE" })),
+  listSlides: (token) => call("/admin/slides", { token }),
+  saveSlide: (token, id, input) => call(id ? `/admin/slides/${id}` : "/admin/slides", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteSlide: async (token, id) => void (await call(`/admin/slides/${id}`, { token, method: "DELETE" })),
+  moveSlide: async (token, id, direction) => void (await call(`/admin/slides/${id}/move`, { token, method: "POST", body: JSON.stringify({ direction }) })),
+
   listBrands: (token) => call("/admin/brands", { token }),
   saveBrand: (token, b) =>
     b.id ? call(`/admin/brands/${b.id}`, { token, method: "PUT", body: JSON.stringify(b) }) : call("/admin/brands", { token, method: "POST", body: JSON.stringify(b) }),
