@@ -81,7 +81,10 @@
     "saveFailed": "تعذّر الحفظ. حاول مرة أخرى.",
     "arRequired": "النص العربي مطلوب.",
     "preview": "معاينة",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "optimizing": "جارٍ تصغير الصورة…",
+    "optimized": "تم تصغير الصورة من {before} إلى {after} ({size}) لتحميل أسرع.",
+    "imageError": "تعذّر قراءة هذه الصورة. جرّب صورة أخرى (PNG أو JPG أو WebP)."
   },
   "brands": {
     "title": "العلامات التجارية",

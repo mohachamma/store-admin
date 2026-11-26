@@ -12,7 +12,7 @@ export async function BrandForm({ brand }: { brand?: AdminBrand }) {
       <Field label={t("name")} htmlFor="brand-name">
         <Input id="brand-name" name="name" defaultValue={brand?.name ?? ""} required />
       </Field>
-      <ImageField name="logo" label={t("logo")} currentUrl={brand?.logoUrl ?? null} contain />
+      <ImageField name="logo" label={t("logo")} currentUrl={brand?.logoUrl ?? null} contain maxSize={600} />
       <p className="-mt-3 text-[11px] text-muted-foreground">{t("logoHint")}</p>
       <Field label={t("link")} htmlFor="brand-href" hint={t("linkHint")}>
         <Input id="brand-href" name="href" dir="ltr" defaultValue={brand?.href ?? ""} />

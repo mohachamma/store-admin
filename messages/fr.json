@@ -81,7 +81,10 @@
     "saveFailed": "Échec de l'enregistrement. Réessayez.",
     "arRequired": "Le texte arabe est obligatoire.",
     "preview": "Aperçu",
-    "optional": "Facultatif"
+    "optional": "Facultatif",
+    "optimizing": "Optimisation de l'image…",
+    "optimized": "Image réduite de {before} à {after} ({size}) pour un chargement plus rapide.",
+    "imageError": "Impossible de lire cette image. Essayez-en une autre (PNG, JPG ou WebP)."
   },
   "brands": {
     "title": "Marques",

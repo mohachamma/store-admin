@@ -70,6 +70,6 @@ Temporary shapes are in `src/lib/api/types.ts`.
 - `GET/POST /admin/offers`, `PUT/DELETE /admin/offers/{id}` — `AdminOffer { id, label, title, subtitle, ctaLabel: {ar,fr,en}, href, imageUrl, theme: "dark"|"light", showCountdown, startsAt, endsAt (ISO), isActive }` (DB table `offers` already exists; countdown requires `endsAt`)
 - `GET/PUT /admin/site` — `{ announcement: {ar,fr,en} }` (empty hides the bar)
 - `GET/PUT /admin/sale-page` — `{ enabled, title: {ar,fr,en}, subtitle: {ar,fr,en} }` (UI to be added; stored in setting `sale_page`)
-- `POST /admin/uploads` (multipart `file`, images ≤ 3 MB) → `{ url }` (Supabase Storage, bucket `product-images`)
+- `POST /admin/uploads` (multipart `file`; PNG/JPEG/WebP/GIF ≤ 3 MB, **no SVG**) → `{ url }` (Cloudflare R2). The dashboard resizes and converts every picked image to WebP in the browser first (`src/lib/image-optimize.ts`, used by `ImageField`): logos ≤ 600 px, offer/banner ≤ 1400 px, product photos ≤ 1600 px.
 - `POST /auth/login` `{ email, password }` → `{ accessToken, expiresIn, user: { id, email, role } }`; 401 on bad credentials, 403 if role ≠ `admin` (or return the role and the dashboard refuses).
 - `GET /admin/stats/overview` → `{ newOrdersToday, revenue: { today, week, month }, revenueLast7Days: number[7], ordersByStatus: { pending, confirmed, shipped, delivered, cancelled, returned }, topProducts: [{ id, name, image, unitsSold, revenue }], lowStock: [{ variantId, productName, size, stock, image }] }` (integer DZD).

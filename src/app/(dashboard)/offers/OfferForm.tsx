@@ -18,7 +18,7 @@ export async function OfferForm({ offer }: { offer?: AdminOffer }) {
       <Field label={t("link")} htmlFor="offer-href" hint={t("linkHint")}>
         <Input id="offer-href" name="href" dir="ltr" defaultValue={offer?.href ?? "/sale"} />
       </Field>
-      <ImageField name="image" label={t("image")} currentUrl={offer?.imageUrl ?? null} />
+      <ImageField name="image" label={t("image")} currentUrl={offer?.imageUrl ?? null} maxSize={1400} />
       <fieldset className="space-y-2">
         <legend className="text-xs font-semibold text-foreground/80">{t("theme")}</legend>
         <div className="flex gap-2">
