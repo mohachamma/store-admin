@@ -10,10 +10,11 @@ import {
   Truck,
   Users,
   Images,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 
-export type NavKey = "overview" | "orders" | "products" | "catalog" | "brands" | "offers" | "content" | "shipping" | "discounts" | "customers" | "settings";
+export type NavKey = "overview" | "orders" | "products" | "catalog" | "brands" | "offers" | "content" | "shipping" | "discounts" | "pages" | "customers" | "settings";
 
 export interface NavItem {
   key: NavKey;
@@ -35,6 +36,7 @@ export const navItems: NavItem[] = [
   { key: "content", href: "/content", icon: Images, phase: 4 },
   { key: "shipping", href: "/shipping", icon: Truck, phase: 4 },
   { key: "discounts", href: "/discounts", icon: TicketPercent, phase: 4 },
+  { key: "pages", href: "/pages", icon: FileText, phase: 7 },
   { key: "customers", href: "/customers", icon: Users, phase: 6 },
   { key: "settings", href: "/settings", icon: Settings, phase: 6 },
 ];

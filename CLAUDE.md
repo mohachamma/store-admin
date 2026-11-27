@@ -67,6 +67,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 - [x] **Phase 5b screens** (2026-11-27): shipping (`/shipping`: 58-wilaya table edited in place with search, same-fee tool, free-delivery threshold), discount codes (`/discounts`: CRUD, kind/value/min/limit/schedule, duplicate → clear error), hero slides (section on `/content`: image, ar/fr/en text, collection or custom link, reorder, schedule). Mock mode has sample data for all three.
 - [x] **Phase 6 screens** (2026-11-28): delivery company picker on `/shipping` (manual / Yalidine, chosen from the API's list); with a company selected, "Confirm order" has no tracking field — the server creates the parcel; order page shows delivery status + "refresh parcel status"; card payment status already shown.
 - [x] **Home sections screens** (2026-11-29) on `/content`: category cards (image, ar/fr/en text, link, reorder, hide), "why us" (6 slots, icon + title + text, show/hide), newsletter block texts + subscribers list (delete on request).
+- [x] **Pages & contact** (2026-11-30) `/pages`: edit the 5 legal pages (title + text in ar/fr/en, published / draft flags) and the store contact details (phone, WhatsApp, email, address, opening hours).
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.
