@@ -20,7 +20,8 @@
     "openStore": "Voir la boutique",
     "account": "Compte",
     "brands": "Marques",
-    "offers": "Offres & promos"
+    "offers": "Offres & promos",
+    "pages": "Pages et contact"
   },
   "login": {
     "title": "Connexion",
@@ -482,5 +483,37 @@
     "subscribers": "Abonnés ({n})",
     "noSubscribers": "Aucun abonné pour le moment.",
     "subscribersHint": "Ce sont des e-mails de clients : des données personnelles. Supprimez un e-mail à la demande de son propriétaire."
+  },
+  "pagesAdmin": {
+    "title": "Pages et contact",
+    "subtitle": "Les pages légales en bas de la boutique et les coordonnées de la page « Contact ».",
+    "legalTitle": "Pages légales",
+    "legalHint": "Ce sont des brouillons que j'ai écrits pour vous. Relisez-les et adaptez-les à votre boutique (ce qui est entre [ ] est à compléter), faites-les relire par un avocat, puis désactivez « Brouillon » pour retirer la mention.",
+    "edit": "Modifier la page",
+    "published": "Publiée",
+    "hidden": "Masquée",
+    "draft": "Brouillon",
+    "reviewed": "Relue",
+    "title_field": "Titre de la page",
+    "body": "Texte",
+    "bodyHint": "Ligne vide = nouveau paragraphe. Commencez une ligne par ## pour un sous-titre ou par - pour une liste, et **texte** pour le gras.",
+    "isPublished": "Publiée dans la boutique",
+    "isDraft": "Encore un brouillon (affiche « à faire relire par un avocat »)",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "arabicNeeded": "Le texte arabe est obligatoire.",
+    "contactTitle": "Coordonnées",
+    "contactHint": "Affichées sur la page « Contact ». Laissez vide pour masquer.",
+    "phone": "Téléphone",
+    "whatsapp": "WhatsApp (numéro algérien)",
+    "whatsappHint": "Ex. : 0550123456. Crée un bouton de discussion dans la boutique.",
+    "email": "E-mail",
+    "address": "Adresse",
+    "hours": "Horaires",
+    "errors": {
+      "generic": "Échec de l'enregistrement. Vérifiez les champs.",
+      "whatsapp": "Numéro WhatsApp invalide.",
+      "email": "E-mail invalide."
+    }
   }
 }

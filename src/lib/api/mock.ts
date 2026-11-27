@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -39,6 +39,8 @@ interface MockDb {
   codes: AdminDiscountCode[];
   slides: AdminSlide[];
   whyUs: AdminWhyUs;
+  pages: AdminInfoPage[];
+  storeInfo: AdminStoreInfo;
   homeCards: AdminHomeCard[];
   newsletter: AdminNewsletter;
   subscribers: { id: string; email: string; createdAt: string }[];
@@ -81,6 +83,8 @@ const db = (): MockDb =>
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
+    pages: ["terms", "privacy", "returns", "shipping", "cod"].map((slug) => ({ slug, title: { ar: slug, fr: slug, en: slug }, body: { ar: "## مسودة\nنص تجريبي.", fr: "", en: "" }, isPublished: true, isDraft: true, updatedAt: new Date().toISOString() })),
+    storeInfo: { phone: "", whatsapp: "", email: "", address: { ar: "", fr: "", en: "" }, hours: { ar: "", fr: "", en: "" } },
     whyUs: { enabled: true, title: { ar: "لماذا نحن", fr: "Pourquoi nous", en: "Why shop with us" }, items: [
       { icon: "truck", title: { ar: "توصيل إلى 58 ولاية", fr: "Livraison dans 58 wilayas", en: "Delivery to 58 wilayas" }, text: { ar: "نوصّل طلبك إلى باب بيتك.", fr: "", en: "" } },
       { icon: "card", title: { ar: "ادفع عند الاستلام", fr: "Paiement à la livraison", en: "Pay on delivery" }, text: { ar: "", fr: "", en: "" } },
@@ -373,6 +377,20 @@ export const mockApi: AdminApi = {
   },
   async deleteDiscountCode(_t, id) {
     db().codes = db().codes.filter((c) => c.id !== id);
+  },
+  async listPages() {
+    return db().pages;
+  },
+  async savePage(_t, slug, input) {
+    const page = db().pages.find((p) => p.slug === slug);
+    if (!page) throw fail(404, "Page not found");
+    return Object.assign(page, { ...input, updatedAt: new Date().toISOString() });
+  },
+  async getStoreInfo() {
+    return db().storeInfo;
+  },
+  async saveStoreInfo(_t, input) {
+    db().storeInfo = input;
   },
   async getWhyUs() {
     return db().whyUs;

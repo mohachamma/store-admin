@@ -43,6 +43,9 @@ export type DiscountCodeInput = S["DiscountCodeInput"];
 export type AdminSlide = S["AdminSlide"];
 export type AdminDelivery = S["AdminDelivery"];
 export type AdminWhyUs = S["AdminWhyUs"];
+export type AdminInfoPage = S["AdminInfoPage"];
+export type InfoPageInput = S["InfoPageInput"];
+export type AdminStoreInfo = S["AdminStoreInfo"];
 export type AdminHomeCard = S["AdminHomeCard"];
 export type HomeCardInput = S["HomeCardInput"];
 export type AdminNewsletter = S["AdminNewsletter"];
@@ -123,6 +126,10 @@ export interface AdminApi {
   deleteSlide(token: string, id: string): Promise<void>;
   moveSlide(token: string, id: string, direction: -1 | 1): Promise<void>;
 
+  listPages(token: string): Promise<AdminInfoPage[]>;
+  savePage(token: string, slug: string, input: InfoPageInput): Promise<AdminInfoPage>;
+  getStoreInfo(token: string): Promise<AdminStoreInfo>;
+  saveStoreInfo(token: string, input: AdminStoreInfo): Promise<void>;
   getWhyUs(token: string): Promise<AdminWhyUs>;
   saveWhyUs(token: string, input: AdminWhyUs): Promise<void>;
   listHomeCards(token: string): Promise<AdminHomeCard[]>;
