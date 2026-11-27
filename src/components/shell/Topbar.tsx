@@ -12,7 +12,7 @@ export async function Topbar() {
   const iconBtn = "relative grid size-10 place-items-center rounded-full transition hover:bg-secondary";
 
   return (
-    <header className="sticky top-0 z-30 print:hidden border-b border-border bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-30 print:hidden bg-background/85 backdrop-blur">
       <div className="flex h-14 items-center justify-between gap-3 px-4 lg:h-16 lg:px-8">
         <AdminLogo className="lg:hidden" />
         <div className="hidden lg:block">

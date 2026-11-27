@@ -1,5 +1,5 @@
 /**
- * Brand of the store — same identity as the storefront (store-web/src/config/brand.ts).
+ * Brand of the store — the dashboard has its own warm cream / serif identity (the storefront keeps its black and white one).
  * Placeholder until the owner provides the real name and logo. Colours are mirrored as
  * CSS variables in `src/app/globals.css` (keep both in sync).
  */
@@ -10,11 +10,12 @@ export const brand = {
   /** Small tag shown next to the wordmark so staff always know they are in the dashboard. */
   adminTag: "ADMIN",
   colors: {
-    ink: "#111111",
-    paper: "#ffffff",
-    mist: "#f4f4f4",
-    line: "#e8e8e8",
-    muted: "#8a8a8a",
+    ink: "#2b2521",
+    paper: "#f6f1e8",
+    mist: "#ebe3d3",
+    line: "#e3dac8",
+    muted: "#776c5f",
+    gold: "#a9833f",
   },
   currency: "DZD",
   /** Storefront URL, used for "view in store" links. */

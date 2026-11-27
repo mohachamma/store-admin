@@ -23,7 +23,7 @@ export async function SlidesSection({ token }: { token: string }) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("title")}</h2>
+          <h2 className="font-display text-xl font-medium">{t("title")}</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">{t("hint")}</p>
         </div>
         <FormSheet trigger={<><Plus className="size-4" /> {t("add")}</>} triggerClassName={cn(buttonVariants())} title={t("add")} action={saveSlideAction}>

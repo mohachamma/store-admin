@@ -20,13 +20,13 @@ export default async function PagesAdminPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
+        <h1 className="font-display text-3xl font-medium">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("legalTitle")}</h2>
+          <h2 className="font-display text-xl font-medium">{t("legalTitle")}</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t("legalHint")}</p>
         </div>
         <ul className="divide-y divide-border rounded-[var(--radius-card)] border border-border">
@@ -54,7 +54,7 @@ export default async function PagesAdminPage() {
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("contactTitle")}</h2>
+          <h2 className="font-display text-xl font-medium">{t("contactTitle")}</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t("contactHint")}</p>
         </div>
         <Card className="max-w-2xl">

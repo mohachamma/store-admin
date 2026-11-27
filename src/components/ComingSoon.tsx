@@ -5,7 +5,7 @@ export async function ComingSoon({ title, icon: Icon, phase }: { title: string; 
   const t = await getTranslations("common");
   return (
     <>
-      <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{title}</h1>
+      <h1 className="font-display text-3xl font-medium">{title}</h1>
       <div className="mt-6 flex flex-col items-center gap-3 rounded-[var(--radius-card)] border border-dashed border-border px-6 py-20 text-center">
         <span className="grid size-14 place-items-center rounded-full bg-secondary">
           <Icon className="size-6" strokeWidth={1.6} />

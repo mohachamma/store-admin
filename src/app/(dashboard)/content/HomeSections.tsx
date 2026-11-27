@@ -32,7 +32,7 @@ export async function HomeSections({ token }: { token: string }) {
     <>
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{tw("title")}</h2>
+          <h2 className="font-display text-xl font-medium">{tw("title")}</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">{tw("hint")}</p>
         </div>
         <Card className="max-w-2xl">
@@ -44,7 +44,7 @@ export async function HomeSections({ token }: { token: string }) {
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{tm("title")}</h2>
+          <h2 className="font-display text-xl font-medium">{tm("title")}</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">{tm("hint")}</p>
         </div>
         <Card className="max-w-2xl">
@@ -57,7 +57,7 @@ export async function HomeSections({ token }: { token: string }) {
       <section className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("cardsTitle")}</h2>
+            <h2 className="font-display text-xl font-medium">{t("cardsTitle")}</h2>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">{t("cardsHint")}</p>
           </div>
           <FormSheet trigger={<><Plus className="size-4" /> {t("addCard")}</>} triggerClassName={cn(buttonVariants())} title={t("addCard")} action={saveCardAction}>
@@ -98,7 +98,7 @@ export async function HomeSections({ token }: { token: string }) {
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("whyTitle")}</h2>
+          <h2 className="font-display text-xl font-medium">{t("whyTitle")}</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">{t("whyHint")}</p>
         </div>
         <Card className="max-w-2xl">
@@ -110,7 +110,7 @@ export async function HomeSections({ token }: { token: string }) {
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{t("newsletterTitle")}</h2>
+          <h2 className="font-display text-xl font-medium">{t("newsletterTitle")}</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">{t("newsletterHint")}</p>
         </div>
         <Card className="max-w-2xl">

@@ -130,7 +130,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
   return (
     <form onSubmit={submit} className="mx-auto max-w-3xl space-y-4">
       <Link href="/products" className="text-xs text-muted-foreground hover:text-foreground">← {t("back")}</Link>
-      <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{product ? t("editTitle") : t("newTitle")}</h1>
+      <h1 className="font-display text-3xl font-medium">{product ? t("editTitle") : t("newTitle")}</h1>
 
       <Card>
         <CardHeader><CardTitle>{t("basic")}</CardTitle></CardHeader>

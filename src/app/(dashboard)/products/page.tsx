@@ -39,7 +39,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
+          <h1 className="font-display text-3xl font-medium">{t("title")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">

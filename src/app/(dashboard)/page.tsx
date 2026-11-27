@@ -17,12 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const statusOrder: OrderStatus[] = ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned"];
 const statusColor: Record<OrderStatus, string> = {
-  pending: "bg-amber-400",
-  confirmed: "bg-sky-500",
-  shipped: "bg-indigo-500",
+  pending: "bg-[#d9a441]",
+  confirmed: "bg-[#7a9cb5]",
+  shipped: "bg-[#8c7bb0]",
   delivered: "bg-ink",
-  cancelled: "bg-neutral-300",
-  returned: "bg-red-400",
+  cancelled: "bg-stone-300",
+  returned: "bg-[#c9695c]",
 };
 
 export default async function OverviewPage() {
@@ -35,21 +35,21 @@ export default async function OverviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
+        <h1 className="font-display text-3xl font-medium">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {/* KPI row — the black card mirrors the storefront's black pill CTA. */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <div className="col-span-2 flex flex-col justify-between gap-4 rounded-[var(--radius-card)] bg-ink p-5 text-paper">
+        <div className="col-span-2 blob flex flex-col justify-between gap-4 bg-ink p-6 text-[#fbf8f2] shadow-[var(--shadow-card)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="label text-paper/60">
+              <p className="label text-[#fbf8f2]/60">
                 {t("revenue")} · {t("today")}
               </p>
               <p className="mt-2 font-display text-3xl tracking-wide lg:text-4xl">{money(data.revenue.today)}</p>
             </div>
-            <span className="grid size-9 place-items-center rounded-full bg-paper/10">
+            <span className="grid size-9 place-items-center rounded-full bg-[#fbf8f2]/10">
               <TrendingUp className="size-4" />
             </span>
           </div>
@@ -79,7 +79,7 @@ export default async function OverviewPage() {
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {statusOrder.map((s) => (
               <li key={s}>
-                <Link href={`/orders?status=${s}`} className="block rounded-2xl bg-secondary px-3 py-2.5 transition hover:bg-secondary/70 active:scale-[0.98]">
+                <Link href={`/orders?status=${s}`} className="block rounded-2xl bg-secondary/70 px-3 py-2.5 transition hover:bg-secondary active:scale-[0.98]">
                   <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <span className={cn("size-2 rounded-full", statusColor[s])} />
                     {ts(s)}
@@ -143,10 +143,10 @@ export default async function OverviewPage() {
 
 function Kpi({ label, value, hint, icon, href }: { label: string; value: string; hint: string; icon: React.ReactNode; href: string }) {
   return (
-    <Link href={href} className="group flex flex-col justify-between gap-3 rounded-[var(--radius-card)] bg-secondary p-5 transition hover:bg-secondary/70">
+    <Link href={href} className="group blob flex flex-col justify-between gap-3 bg-surface p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-2">
         <p className="label leading-snug text-muted-foreground">{label}</p>
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-background">{icon}</span>
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-gold-soft text-gold">{icon}</span>
       </div>
       <div>
         <p className="font-display text-4xl">{value}</p>
@@ -161,7 +161,7 @@ function Kpi({ label, value, hint, icon, href }: { label: string; value: string;
 
 function MiniKpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[var(--radius-card)] border border-border px-4 py-3">
+    <div className="rounded-[var(--radius-card)] bg-surface px-5 py-3 shadow-[var(--shadow-card)]">
       <p className="label text-muted-foreground">{label}</p>
       <p className="mt-1 text-lg font-semibold">{value}</p>
     </div>

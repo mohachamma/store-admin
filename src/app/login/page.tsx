@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <LanguageToggle />
         </div>
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
-          <h1 className="font-display text-3xl uppercase tracking-[0.12em]">{t("title")}</h1>
+          <h1 className="font-display text-4xl font-medium">{t("title")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{t("subtitle")}</p>
           <LoginForm next={next} />
           {usingMock ? (

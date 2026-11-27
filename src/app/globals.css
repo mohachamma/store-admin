@@ -1,32 +1,37 @@
 @import "tailwindcss";
 
-/* Store identity — same tokens as store-web (keep in sync with src/config/brand.ts). */
+/* Dashboard identity: warm cream, soft cards, serif headings (keep in sync with src/config/brand.ts). */
 :root {
-  --ink: #111111;
-  --paper: #ffffff;
-  --mist: #f4f4f4;
-  --line: #e8e8e8;
-  --muted: #8a8a8a;
+  --ink: #2b2521;
+  --paper: #f6f1e8;
+  --surface: #fbf8f2;
+  --sidebar: #efe8da;
+  --mist: #ebe3d3;
+  --line: #e3dac8;
+  --muted: #776c5f;
+  --gold: #a9833f;
+  --gold-soft: #efe2c4;
 
   /* shadcn/ui semantic tokens mapped onto the brand */
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: var(--paper);
+  --card: var(--surface);
   --card-foreground: var(--ink);
-  --popover: var(--paper);
+  --popover: var(--surface);
   --popover-foreground: var(--ink);
   --primary: var(--ink);
-  --primary-foreground: var(--paper);
+  --primary-foreground: #fbf8f2;
   --secondary: var(--mist);
   --secondary-foreground: var(--ink);
   --muted-foreground: var(--muted);
   --accent: var(--mist);
   --accent-foreground: var(--ink);
-  --destructive: #c0353b;
+  --destructive: #b5473b;
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--ink);
-  --radius-card: 1.25rem;
+  --ring: var(--gold);
+  --radius-card: 1.5rem;
+  --shadow-card: 0 1px 2px rgb(70 50 25 / 0.04), 0 10px 28px rgb(70 50 25 / 0.07);
   --bottombar-h: 64px;
 }
 
@@ -52,8 +57,12 @@
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-mist: var(--mist);
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
   --font-sans: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-wordmark), var(--font-arabic), ui-sans-serif, sans-serif;
+  --font-display: var(--font-wordmark), var(--font-arabic-display), Georgia, serif;
 }
 
 * {
@@ -73,15 +82,17 @@ body {
 }
 
 @utility label {
-  font-size: 11px;
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  line-height: 1.3;
+  font-weight: 600;
   &:lang(ar) {
-    font-size: 12.5px;
-    letter-spacing: 0;
+    font-size: 13px;
   }
+}
+
+/* Soft, slightly irregular card corners (the identity's signature shape). */
+@utility blob {
+  border-radius: 1.75rem 2.75rem 2.25rem 2.5rem / 2.25rem 1.75rem 2.75rem 2rem;
 }
 
 @utility no-scrollbar {
