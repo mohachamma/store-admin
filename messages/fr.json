@@ -302,7 +302,12 @@
       "compare": "Le prix barré doit être supérieur au prix.",
       "sku": "Cette référence est déjà utilisée par un autre produit.",
       "price": "Le prix est obligatoire pour chaque variante."
-    }
+    },
+    "audience": "Pour qui ?",
+    "audienceUnisex": "Tous",
+    "audienceWomen": "Femme",
+    "audienceMen": "Homme",
+    "audienceHint": "« Femme » et « Tous » apparaissent sur la page Femme."
   },
   "inventory": {
     "title": "Stock et prix",
@@ -515,5 +520,29 @@
       "whatsapp": "Numéro WhatsApp invalide.",
       "email": "E-mail invalide."
     }
+  },
+  "womenPage": {
+    "title": "Page Femme",
+    "hint": "Une page dédiée à la mode féminine, avec un lien « Femme » dans le menu de la boutique. Vous choisissez les produits via le champ « Pour qui ? » de chaque produit.",
+    "show": "Afficher la page Femme et son lien dans la boutique",
+    "pageTitle": "Titre de la page",
+    "pageSubtitle": "Texte sous le titre",
+    "cover": "Image de couverture",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "titleRequired": "Le titre en arabe est obligatoire.",
+    "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
+  },
+  "menPage": {
+    "title": "Page Homme",
+    "hint": "Une page dédiée à la mode masculine, avec un lien « Homme » dans le menu de la boutique. Vous choisissez les produits via le champ « Pour qui ? » de chaque produit.",
+    "show": "Afficher la page Homme et son lien dans la boutique",
+    "pageTitle": "Titre de la page",
+    "pageSubtitle": "Texte sous le titre",
+    "cover": "Image de couverture",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "titleRequired": "Le titre en arabe est obligatoire.",
+    "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
   }
 }

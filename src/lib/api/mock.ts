@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -39,6 +39,8 @@ interface MockDb {
   codes: AdminDiscountCode[];
   slides: AdminSlide[];
   whyUs: AdminWhyUs;
+  womenPage: AdminWomenPage;
+  menPage: AdminMenPage;
   pages: AdminInfoPage[];
   storeInfo: AdminStoreInfo;
   homeCards: AdminHomeCard[];
@@ -83,6 +85,8 @@ const db = (): MockDb =>
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
+    menPage: { enabled: true, title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث ملابس الرجال", fr: "", en: "" }, heroUrl: null },
+    womenPage: { enabled: true, title: { ar: "نساء", fr: "Femme", en: "Women" }, subtitle: { ar: "أحدث ملابس النساء", fr: "", en: "" }, heroUrl: null },
     pages: ["terms", "privacy", "returns", "shipping", "cod"].map((slug) => ({ slug, title: { ar: slug, fr: slug, en: slug }, body: { ar: "## مسودة\nنص تجريبي.", fr: "", en: "" }, isPublished: true, isDraft: true, updatedAt: new Date().toISOString() })),
     storeInfo: { phone: "", whatsapp: "", email: "", address: { ar: "", fr: "", en: "" }, hours: { ar: "", fr: "", en: "" } },
     whyUs: { enabled: true, title: { ar: "لماذا نحن", fr: "Pourquoi nous", en: "Why shop with us" }, items: [
@@ -140,7 +144,7 @@ function sampleCatalog() {
   const cat = (slug: string, ar: string, fr: string, en: string) => ({ id: `c_${slug}`, slug, name: { ar, fr, en }, imageUrl: null, isActive: true });
   const categories = [cat("outerwear", "ملابس خارجية", "Vestes & manteaux", "Outerwear"), cat("tops", "قمصان وتيشرتات", "Hauts", "Tops"), cat("footwear", "أحذية", "Chaussures", "Footwear"), cat("bottoms", "سراويل", "Bas", "Bottoms")];
   const p = (slug: string, ar: string, fr: string, en: string, categoryId: string, art: string, price: number, compare: number | null, sizes: string[], pub = true): AdminProduct => ({
-    id: `p_${slug}`, slug, name: { ar, fr, en }, description: { ar: "", fr: "", en: "" }, categoryId, brandId: null, isPublished: pub, isNew: false,
+    id: `p_${slug}`, slug, name: { ar, fr, en }, description: { ar: "", fr: "", en: "" }, categoryId, brandId: null, isPublished: pub, isNew: false, audience: "unisex",
     images: [{ url: `/placeholders/${art}.svg` }],
     variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare })),
   });
@@ -233,7 +237,7 @@ export const mockApi: AdminApi = {
       const cheapest = [...p.variants].sort((a, b) => a.price - b.price)[0];
       const cat = d.categories.find((c) => c.id === p.categoryId);
       return {
-        id: p.id, slug: p.slug, name: p.name[lang] || p.name.ar, categoryName: cat ? cat.name[lang] || cat.name.ar : "", isPublished: p.isPublished, isNew: p.isNew,
+        id: p.id, slug: p.slug, name: p.name[lang] || p.name.ar, categoryName: cat ? cat.name[lang] || cat.name.ar : "", isPublished: p.isPublished, isNew: p.isNew, audience: p.audience,
         price: cheapest?.price ?? null, compareAtPrice: cheapest?.compareAtPrice ?? null, totalStock: p.variants.reduce((n, v) => n + v.stock, 0), variantCount: p.variants.length, image: p.images[0]?.url ?? null,
       };
     });
@@ -251,7 +255,7 @@ export const mockApi: AdminApi = {
     if (id && !old) throw fail(404, "Product not found");
     const product: AdminProduct = {
       id: old?.id ?? newId("p"), slug: old?.slug ?? slugOf(input.name, "product"), name: { ...input.name }, description: { ar: input.description?.ar ?? "", fr: input.description?.fr ?? "", en: input.description?.en ?? "" },
-      categoryId: input.categoryId, brandId: input.brandId ?? null, isPublished: input.isPublished ?? false, isNew: input.isNew ?? false,
+      categoryId: input.categoryId, brandId: input.brandId ?? null, isPublished: input.isPublished ?? false, isNew: input.isNew ?? false, audience: input.audience ?? "unisex",
       images: (input.images ?? []).map((url) => ({ url })),
       variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null })),
     };
@@ -268,6 +272,23 @@ export const mockApi: AdminApi = {
     let n = 0;
     for (const p of db().products) if (ids.includes(p.id) && (!isPublished || (p.variants.length && p.images.length))) { p.isPublished = isPublished; n++; }
     return n;
+  },
+  async setAudience(_t, ids, audience) {
+    let n = 0;
+    for (const p of db().products) if (ids.includes(p.id)) { p.audience = audience; n++; }
+    return n;
+  },
+  async getMenPage() {
+    return db().menPage;
+  },
+  async saveMenPage(_t, input) {
+    db().menPage = input;
+  },
+  async getWomenPage() {
+    return db().womenPage;
+  },
+  async saveWomenPage(_t, input) {
+    db().womenPage = input;
   },
   async listCategories() {
     const d = db();

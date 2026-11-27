@@ -99,3 +99,37 @@ export async function deleteSubscriberAction(id: string) {
   await api.deleteSubscriber(await requireSession(), id);
   revalidatePath("/content");
 }
+
+// ---- Women's and men's pages --------------------------------------------------------------------------------------
+async function saveAudiencePage(kind: "women" | "men", form: FormData): Promise<FormState> {
+  const token = await requireSession();
+  const t = await getTranslations(kind === "women" ? "womenPage" : "menPage");
+  const tf = await getTranslations("form");
+  const title = readI18n(form, "title");
+  const subtitle = readI18n(form, "subtitle");
+  if (!title.ar) return { error: t("titleRequired") };
+  if (arabicMissing(subtitle)) return { error: t("arabicNeeded") };
+  try {
+    let heroUrl: string | null = String(form.get("heroUrl") ?? "") || null;
+    const file = form.get("hero");
+    if (file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/") || file.size > MAX_IMAGE) return { error: tf("uploadFailed") };
+      heroUrl = await api.uploadImage(token, file);
+    }
+    const input = { enabled: form.get("enabled") === "on", title, subtitle, heroUrl };
+    if (kind === "women") await api.saveWomenPage(token, input);
+    else await api.saveMenPage(token, input);
+  } catch {
+    return { error: tf("saveFailed") };
+  }
+  revalidatePath("/content");
+  return { ok: true, at: Date.now() };
+}
+
+export async function saveWomenPageAction(_prev: FormState, form: FormData): Promise<FormState> {
+  return saveAudiencePage("women", form);
+}
+
+export async function saveMenPageAction(_prev: FormState, form: FormData): Promise<FormState> {
+  return saveAudiencePage("men", form);
+}

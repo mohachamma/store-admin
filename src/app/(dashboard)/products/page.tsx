@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
 import { formatDZD } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { AudienceSelect } from "./AudienceSelect";
 import { publishProductAction } from "./actions";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -89,6 +90,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 <p className="text-[11px] text-muted-foreground">{t("variants", { n: p.variantCount })} · {t("stock", { n: p.totalStock })}</p>
               </Link>
               <div className="flex shrink-0 flex-col items-end gap-2">
+                <AudienceSelect id={p.id} value={p.audience} />
                 <Badge variant={p.isPublished ? "success" : "secondary"}>{p.isPublished ? t("published") : t("draft")}</Badge>
                 <form action={publishProductAction.bind(null, p.id, !p.isPublished)}>
                   <button type="submit" className="flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-muted-foreground transition hover:bg-secondary hover:text-foreground">
