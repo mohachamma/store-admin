@@ -55,7 +55,7 @@ export default async function OverviewPage() {
           </div>
           <Sparkbars values={data.revenueLast7Days} />
         </div>
-        <Kpi label={t("newOrdersToday")} value={String(data.newOrdersToday)} hint={t("pendingHint", { count: data.ordersByStatus.pending })} icon={<PackagePlus className="size-4" />} href="/orders" />
+        <Kpi label={t("newOrdersToday")} value={String(data.newOrdersToday)} hint={t("pendingHint", { count: data.ordersByStatus.pending })} icon={<PackagePlus className="size-4" />} href="/orders?status=pending" />
         <div className="grid gap-3 lg:gap-4">
           <MiniKpi label={t("week")} value={money(data.revenue.week)} />
           <MiniKpi label={t("month")} value={money(data.revenue.month)} />
@@ -78,12 +78,14 @@ export default async function OverviewPage() {
           </div>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {statusOrder.map((s) => (
-              <li key={s} className="rounded-2xl bg-secondary px-3 py-2.5">
-                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <span className={cn("size-2 rounded-full", statusColor[s])} />
-                  {ts(s)}
-                </div>
-                <p className="mt-1 text-lg font-semibold tabular-nums">{data.ordersByStatus[s]}</p>
+              <li key={s}>
+                <Link href={`/orders?status=${s}`} className="block rounded-2xl bg-secondary px-3 py-2.5 transition hover:bg-secondary/70 active:scale-[0.98]">
+                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <span className={cn("size-2 rounded-full", statusColor[s])} />
+                    {ts(s)}
+                  </div>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{data.ordersByStatus[s]}</p>
+                </Link>
               </li>
             ))}
           </ul>
