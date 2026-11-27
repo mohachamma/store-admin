@@ -68,6 +68,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 - [x] **Phase 6 screens** (2026-11-28): delivery company picker on `/shipping` (manual / Yalidine, chosen from the API's list); with a company selected, "Confirm order" has no tracking field — the server creates the parcel; order page shows delivery status + "refresh parcel status"; card payment status already shown.
 - [x] **Home sections screens** (2026-11-29) on `/content`: category cards (image, ar/fr/en text, link, reorder, hide), "why us" (6 slots, icon + title + text, show/hide), newsletter block texts + subscribers list (delete on request).
 - [x] **Pages & contact** (2026-11-30) `/pages`: edit the 5 legal pages (title + text in ar/fr/en, published / draft flags) and the store contact details (phone, WhatsApp, email, address, opening hours).
+- [x] **Women's page** (2026-12-01): product field "who is this for" (women / men / all) in the product form and a one-tap select on each product row; "Women's page" section on `/content` (show/hide, title + subtitle ar/fr/en, cover image).
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.

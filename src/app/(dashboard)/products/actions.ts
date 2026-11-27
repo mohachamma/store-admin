@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { api } from "@/lib/api";
-import type { BulkVariantUpdate, ProductInput } from "@/lib/api/types";
+import type { Audience, BulkVariantUpdate, ProductInput } from "@/lib/api/types";
 import { requireSession } from "@/lib/auth";
 
 export type SaveProductResult = { ok: true; id: string } | { ok: false; code: string; message: string };
@@ -29,6 +29,11 @@ export async function deleteProductAction(id: string) {
 
 export async function publishProductAction(id: string, isPublished: boolean) {
   await api.publishProducts(await requireSession(), [id], isPublished);
+  revalidatePath("/products");
+}
+
+export async function setAudienceAction(id: string, audience: Audience) {
+  await api.setAudience(await requireSession(), [id], audience);
   revalidatePath("/products");
 }
 

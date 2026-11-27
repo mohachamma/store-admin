@@ -114,7 +114,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
     setError(null);
     start(async () => {
       const r = await saveProductAction(product?.id ?? null, {
-        name, description, categoryId, brandId: String(f.get("brandId") ?? "") || null, isPublished, isNew: f.get("isNew") === "on", images, variants,
+        name, description, categoryId, brandId: String(f.get("brandId") ?? "") || null, isPublished, isNew: f.get("isNew") === "on", audience: (["women", "men"].includes(String(f.get("audience"))) ? String(f.get("audience")) : "unisex") as "women" | "men" | "unisex", images, variants,
       });
       if (r.ok) return router.push("/products");
       setError(r.code === "conflict" ? t("errors.sku") : `${t("errors.generic")}${r.message ? ` (${r.message})` : ""}`);
@@ -242,6 +242,15 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
         <CardContent className="space-y-4">
           <SwitchField name="isPublished" label={t("isPublished")} hint={t("isPublishedHint")} defaultChecked={product?.isPublished ?? false} />
           <SwitchField name="isNew" label={t("isNew")} defaultChecked={product?.isNew ?? false} />
+          <div className="space-y-2">
+            <label htmlFor="audience" className="text-xs font-semibold text-foreground/80">{t("audience")}</label>
+            <select id="audience" name="audience" defaultValue={product?.audience ?? "unisex"} className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm">
+              <option value="unisex">{t("audienceUnisex")}</option>
+              <option value="women">{t("audienceWomen")}</option>
+              <option value="men">{t("audienceMen")}</option>
+            </select>
+            <p className="text-[11px] text-muted-foreground">{t("audienceHint")}</p>
+          </div>
         </CardContent>
       </Card>
 

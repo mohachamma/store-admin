@@ -43,6 +43,8 @@ export type DiscountCodeInput = S["DiscountCodeInput"];
 export type AdminSlide = S["AdminSlide"];
 export type AdminDelivery = S["AdminDelivery"];
 export type AdminWhyUs = S["AdminWhyUs"];
+export type AdminWomenPage = S["AdminWomenPage"];
+export type Audience = "women" | "men" | "unisex";
 export type AdminInfoPage = S["AdminInfoPage"];
 export type InfoPageInput = S["InfoPageInput"];
 export type AdminStoreInfo = S["AdminStoreInfo"];
@@ -101,6 +103,9 @@ export interface AdminApi {
   saveProduct(token: string, id: string | null, input: ProductInput): Promise<AdminProduct>;
   deleteProduct(token: string, id: string): Promise<void>;
   publishProducts(token: string, ids: string[], isPublished: boolean): Promise<number>;
+  setAudience(token: string, ids: string[], audience: Audience): Promise<number>;
+  getWomenPage(token: string): Promise<AdminWomenPage>;
+  saveWomenPage(token: string, input: AdminWomenPage): Promise<void>;
   listCategories(token: string): Promise<AdminCategory[]>;
   saveCategory(token: string, id: string | null, input: CategoryInput): Promise<AdminCategory>;
   deleteCategory(token: string, id: string): Promise<void>;
