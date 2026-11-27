@@ -88,7 +88,7 @@ const db = (): MockDb =>
     menPage: { enabled: true, title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث ملابس الرجال", fr: "", en: "" }, heroUrl: null },
     womenPage: { enabled: true, title: { ar: "نساء", fr: "Femme", en: "Women" }, subtitle: { ar: "أحدث ملابس النساء", fr: "", en: "" }, heroUrl: null },
     pages: ["terms", "privacy", "returns", "shipping", "cod"].map((slug) => ({ slug, title: { ar: slug, fr: slug, en: slug }, body: { ar: "## مسودة\nنص تجريبي.", fr: "", en: "" }, isPublished: true, isDraft: true, updatedAt: new Date().toISOString() })),
-    storeInfo: { phone: "", whatsapp: "", email: "", address: { ar: "", fr: "", en: "" }, hours: { ar: "", fr: "", en: "" } },
+    storeInfo: { phone: "", whatsapp: "", email: "", address: { ar: "", fr: "", en: "" }, hours: { ar: "", fr: "", en: "" }, siteTitle: { ar: "", fr: "", en: "" }, siteDescription: { ar: "", fr: "", en: "" } },
     whyUs: { enabled: true, title: { ar: "لماذا نحن", fr: "Pourquoi nous", en: "Why shop with us" }, items: [
       { icon: "truck", title: { ar: "توصيل إلى 58 ولاية", fr: "Livraison dans 58 wilayas", en: "Delivery to 58 wilayas" }, text: { ar: "نوصّل طلبك إلى باب بيتك.", fr: "", en: "" } },
       { icon: "card", title: { ar: "ادفع عند الاستلام", fr: "Paiement à la livraison", en: "Pay on delivery" }, text: { ar: "", fr: "", en: "" } },

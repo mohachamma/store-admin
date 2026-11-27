@@ -25,6 +25,8 @@ export function StoreInfoForm({ value }: { value: AdminStoreInfo }) {
       </Field>
       <I18nFields name="address" label={t("address")} defaults={value.address} />
       <I18nFields name="hours" label={t("hours")} defaults={value.hours} />
+      <I18nFields name="siteTitle" label={t("siteTitle")} hint={t("siteTitleHint")} defaults={value.siteTitle} />
+      <I18nFields name="siteDescription" label={t("siteDescription")} hint={t("siteDescriptionHint")} defaults={value.siteDescription} />
       {state.error ? <p role="alert" className="text-sm text-destructive">{state.error}</p> : null}
       {state.ok ? <p role="status" className="text-sm text-emerald-700">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : null} {t("save")}</Button>

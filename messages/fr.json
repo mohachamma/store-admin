@@ -519,7 +519,11 @@
       "generic": "Échec de l'enregistrement. Vérifiez les champs.",
       "whatsapp": "Numéro WhatsApp invalide.",
       "email": "E-mail invalide."
-    }
+    },
+    "siteTitle": "Titre de la boutique sur Google",
+    "siteTitleHint": "Affiché dans les résultats de recherche et l'onglet du navigateur pour la page d'accueil. Laissez vide pour le titre par défaut.",
+    "siteDescription": "Description de la boutique sur Google",
+    "siteDescriptionHint": "Une ou deux phrases sous le titre dans les résultats de recherche et lors du partage du lien (environ 160 caractères)."
   },
   "womenPage": {
     "title": "Page Femme",

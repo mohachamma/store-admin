@@ -28,7 +28,9 @@ export async function saveStoreInfoAction(_prev: FormState, form: FormData): Pro
   const t = await getTranslations("pagesAdmin");
   const address = readI18n(form, "address");
   const hours = readI18n(form, "hours");
-  for (const v of [address, hours]) if ((v.fr || v.en) && !v.ar) return { error: t("arabicNeeded") };
+  const siteTitle = readI18n(form, "siteTitle");
+  const siteDescription = readI18n(form, "siteDescription");
+  for (const v of [address, hours, siteTitle, siteDescription]) if ((v.fr || v.en) && !v.ar) return { error: t("arabicNeeded") };
   try {
     await api.saveStoreInfo(token, {
       phone: String(form.get("phone") ?? "").trim(),
@@ -36,6 +38,8 @@ export async function saveStoreInfoAction(_prev: FormState, form: FormData): Pro
       email: String(form.get("email") ?? "").trim(),
       address,
       hours,
+      siteTitle,
+      siteDescription,
     });
   } catch (e) {
     const msg = (e as { message?: string }).message ?? "";
