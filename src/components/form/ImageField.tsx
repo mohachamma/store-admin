@@ -96,7 +96,7 @@ export function ImageField({
         </div>
       </div>
       {busy ? <p className="text-[11px] text-muted-foreground">{t("optimizing")}</p> : null}
-      {info ? <p className="text-[11px] text-emerald-700">{info}</p> : null}
+      {info ? <p className="text-[11px] text-emerald-400 light:text-emerald-700">{info}</p> : null}
       {error ? (
         <p role="alert" className="text-[11px] text-destructive">
           {error}

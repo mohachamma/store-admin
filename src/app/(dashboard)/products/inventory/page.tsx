@@ -33,7 +33,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     <div className="space-y-5">
       <div>
         <Link href="/products" className="text-xs text-muted-foreground hover:text-foreground">← {tp("back")}</Link>
-        <h1 className="mt-2 font-display text-2xl uppercase tracking-[0.08em]">{t("title")}</h1>
+        <h1 className="mt-2 font-display text-3xl font-medium">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
       <form action="/products/inventory" className="flex flex-wrap items-center gap-3">

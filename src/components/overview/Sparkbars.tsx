@@ -6,7 +6,7 @@ export function Sparkbars({ values }: { values: number[] }) {
       {values.map((v, i) => (
         <div
           key={i}
-          className={i === values.length - 1 ? "flex-1 rounded-md bg-paper" : "flex-1 rounded-md bg-paper/20"}
+          className={i === values.length - 1 ? "flex-1 rounded-md bg-paper" : "flex-1 rounded-md bg-paper/25"}
           style={{ height: `${Math.max(8, (v / max) * 100)}%` }}
         />
       ))}

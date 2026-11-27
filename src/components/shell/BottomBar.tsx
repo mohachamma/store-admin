@@ -27,14 +27,14 @@ export function BottomBar() {
   return (
     <nav
       aria-label={t("menu")}
-      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden mx-3 mb-3 rounded-full border border-border bg-[#1c1714]/80 light:bg-white/90 pb-0 shadow-[0_10px_36px_rgb(0_0_0/0.5)] backdrop-blur-xl lg:hidden"
     >
-      <div className="flex h-[var(--bottombar-h)] items-stretch px-2">
+      <div className="flex h-16 items-stretch px-2">
         {primary.map(({ key, href, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (
             <Link key={key} href={href} aria-current={active ? "page" : undefined} className={cn(cell, active ? "text-foreground" : "text-muted-foreground")}>
-              <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", active && "bg-ink text-paper")}>
+              <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", active && "bg-ink text-paper shadow-[0_6px_18px_rgb(244_122_32/0.45)] light:shadow-none")}>
                 <Icon className="size-[18px]" strokeWidth={1.8} />
               </span>
               {t(key)}

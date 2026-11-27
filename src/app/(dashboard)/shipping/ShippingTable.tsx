@@ -86,7 +86,7 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
         {visible.map((w) => {
           const v = val(w);
           return (
-            <li key={w.code} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[3rem_1fr_7rem_7rem_4.5rem]", edits[w.code] && "bg-amber-50", !v.active && "opacity-60")}>
+            <li key={w.code} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[3rem_1fr_7rem_7rem_4.5rem]", edits[w.code] && "bg-primary/10", !v.active && "opacity-60")}>
               <span className="hidden text-xs tabular-nums text-muted-foreground md:block" dir="ltr">{String(w.code).padStart(2, "0")}</span>
               <span className="text-sm font-medium"><span className="text-xs text-muted-foreground md:hidden" dir="ltr">{String(w.code).padStart(2, "0")} · </span>{name(w)}</span>
               <label className="flex items-center justify-end gap-2 text-xs md:order-last md:justify-center">
@@ -103,7 +103,7 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
       </ul>
 
       <div className="sticky bottom-[calc(var(--bottombar-h)+env(safe-area-inset-bottom)+0.5rem)] z-10 flex items-center justify-between gap-3 rounded-full border border-border bg-background/95 p-2 ps-5 shadow-lg backdrop-blur lg:bottom-4">
-        <span className={cn("text-xs", message ? (message.ok ? "text-emerald-700" : "text-destructive") : "text-muted-foreground")} role={message && !message.ok ? "alert" : undefined}>
+        <span className={cn("text-xs", message ? (message.ok ? "text-emerald-400 light:text-emerald-700" : "text-destructive") : "text-muted-foreground")} role={message && !message.ok ? "alert" : undefined}>
           {message ? message.text : changes.length ? t("unsaved", { n: changes.length }) : ""}
         </span>
         <Button type="button" size="lg" onClick={save} disabled={pending || changes.length === 0}>

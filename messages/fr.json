@@ -17,6 +17,8 @@
     "notifications": "Notifications",
     "logout": "Se déconnecter",
     "language": "Langue",
+    "themeLight": "Mode clair (noir et blanc)",
+    "themeDark": "Mode sombre",
     "openStore": "Voir la boutique",
     "account": "Compte",
     "brands": "Marques",
