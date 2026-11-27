@@ -54,10 +54,21 @@ export type HomeCardInput = S["HomeCardInput"];
 export type AdminNewsletter = S["AdminNewsletter"];
 export type NewsletterSubscribers = S["NewsletterSubscribers"];
 export type SlideInput = S["SlideInput"];
+export type ProfitReport = S["ProfitReport"];
+export type Expense = S["Expense"];
+export type ExpenseInput = S["ExpenseInput"];
+export type ExpenseCategory = Expense["category"];
+export type ProfitSettings = S["ProfitSettings"];
+export interface DateRange {
+  from?: string;
+  to?: string;
+}
 export interface WilayaUpdate {
   code: number;
   homeFee?: number;
   deskFee?: number;
+  homeCost?: number;
+  deskCost?: number;
   active?: boolean;
 }
 
@@ -79,6 +90,7 @@ export interface BulkVariantUpdate {
   price?: number;
   compareAtPrice?: number | null;
   stock?: number;
+  costPrice?: number | null;
 }
 
 export interface OrderFilters {
@@ -123,6 +135,12 @@ export interface AdminApi {
   getShipping(token: string): Promise<AdminShipping>;
   updateWilayas(token: string, updates: WilayaUpdate[]): Promise<number>;
   setFreeShipping(token: string, over: number | null): Promise<void>;
+  getProfit(token: string, range: DateRange): Promise<ProfitReport>;
+  listExpenses(token: string, range: DateRange): Promise<Expense[]>;
+  saveExpense(token: string, id: string | null, input: ExpenseInput): Promise<Expense>;
+  deleteExpense(token: string, id: string): Promise<void>;
+  getProfitSettings(token: string): Promise<ProfitSettings>;
+  saveProfitSettings(token: string, input: ProfitSettings): Promise<void>;
   getDelivery(token: string): Promise<AdminDelivery>;
   setDelivery(token: string, provider: string): Promise<AdminDelivery>;
   refreshTracking(token: string, id: string): Promise<string>;

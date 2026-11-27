@@ -21,7 +21,7 @@ export default async function ShippingPage() {
         <h1 className="font-display text-3xl font-medium">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
-      <p className="flex items-start gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-900">
+      <p className="flex items-start gap-2 rounded-2xl bg-amber-400/10 px-4 py-3 text-xs text-amber-200 light:bg-amber-50 light:text-amber-900">
         <TriangleAlert className="mt-0.5 size-4 shrink-0" /> {t("placeholderWarning")}
       </p>
       <Card className="max-w-2xl">

@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, Expense, ProfitSettings, ProfitReport, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -46,6 +46,8 @@ interface MockDb {
   homeCards: AdminHomeCard[];
   newsletter: AdminNewsletter;
   subscribers: { id: string; email: string; createdAt: string }[];
+  expenses: Expense[];
+  profitSettings: ProfitSettings;
 }
 /** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
 type MockOrder = AdminOrderRow & {
@@ -82,7 +84,13 @@ const db = (): MockDb =>
     deliveryProvider: "manual",
     wilayas: [
       [16, "الجزائر", "Alger", 500, 350], [31, "وهران", "Oran", 700, 450], [25, "قسنطينة", "Constantine", 700, 450], [9, "البليدة", "Blida", 500, 350], [19, "سطيف", "Sétif", 800, 550], [30, "ورقلة", "Ouargla", 1200, 800],
-    ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
+    ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, homeCost: Math.round((homeFee as number) * 0.7), deskCost: Math.round((deskFee as number) * 0.7), active: true })),
+    expenses: [
+      { id: "ex_1", spentOn: new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "facebook", amount: 18_000, note: null },
+      { id: "ex_2", spentOn: new Date(Date.now() - 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "tiktok", amount: 9_500, note: null },
+      { id: "ex_3", spentOn: new Date().toISOString().slice(0, 10), category: "packaging" as const, platform: null, amount: 4_200, note: "Bags" },
+    ],
+    profitSettings: { returnFee: 200, returnedItemsLost: false, cardFeePercent: 0 },
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
     menPage: { enabled: true, title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث ملابس الرجال", fr: "", en: "" }, heroUrl: null },
@@ -146,7 +154,7 @@ function sampleCatalog() {
   const p = (slug: string, ar: string, fr: string, en: string, categoryId: string, art: string, price: number, compare: number | null, sizes: string[], pub = true): AdminProduct => ({
     id: `p_${slug}`, slug, name: { ar, fr, en }, description: { ar: "", fr: "", en: "" }, categoryId, brandId: null, isPublished: pub, isNew: false, audience: "unisex",
     images: [{ url: `/placeholders/${art}.svg`, color: null }],
-    variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", colorHex: null, sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare })),
+    variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", colorHex: null, sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare, costPrice: Math.round(price * 0.55) })),
   });
   const products = [
     p("nylon-zip-hoodie", "هودي بسحاب نايلون", "Hoodie zippé en nylon", "Nylon Full Zip Hoodie", "c_outerwear", "hoodie-stone", 7900, null, ["XS", "S", "M", "L", "XL"]),
@@ -257,7 +265,7 @@ export const mockApi: AdminApi = {
       id: old?.id ?? newId("p"), slug: old?.slug ?? slugOf(input.name, "product"), name: { ...input.name }, description: { ar: input.description?.ar ?? "", fr: input.description?.fr ?? "", en: input.description?.en ?? "" },
       categoryId: input.categoryId, brandId: input.brandId ?? null, isPublished: input.isPublished ?? false, isNew: input.isNew ?? false, audience: input.audience ?? "unisex",
       images: (input.images ?? []).map((url, i) => ({ url, color: input.imageColors?.[i] ?? null })),
-      variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", colorHex: v.colorHex ?? null, sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null })),
+      variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", colorHex: v.colorHex ?? null, sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null, costPrice: v.costPrice ?? null })),
     };
     if (old) d.products[d.products.indexOf(old)] = product;
     else d.products.unshift(product);
@@ -331,7 +339,7 @@ export const mockApi: AdminApi = {
   },
   async listVariants(_t, f, locale) {
     const lang = (locale === "fr" ? "fr" : "ar") as "ar" | "fr";
-    let rows = db().products.flatMap((p) => p.variants.map((v) => ({ variantId: v.id, productId: p.id, productName: p.name[lang] || p.name.ar, image: p.images[0]?.url ?? null, size: v.size, color: v.color, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice })));
+    let rows = db().products.flatMap((p) => p.variants.map((v) => ({ variantId: v.id, productId: p.id, productName: p.name[lang] || p.name.ar, image: p.images[0]?.url ?? null, size: v.size, color: v.color, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice, costPrice: v.costPrice })));
     if (f.lowStock) rows = rows.filter((r) => r.stock <= 3);
     if (f.q) rows = rows.filter((r) => `${r.productName} ${r.size}`.toLowerCase().includes(f.q!.toLowerCase()));
     return { items: rows.slice(f.offset ?? 0, (f.offset ?? 0) + (f.limit ?? 100)), total: rows.length };
@@ -351,6 +359,7 @@ export const mockApi: AdminApi = {
       if (u.price !== undefined) v.price = u.price;
       if (u.compareAtPrice !== undefined) v.compareAtPrice = u.compareAtPrice;
       if (u.stock !== undefined) v.stock = u.stock;
+      if (u.costPrice !== undefined) v.costPrice = u.costPrice;
     }
     return updates.length;
   },
@@ -362,9 +371,55 @@ export const mockApi: AdminApi = {
     for (const u of updates) {
       const w = db().wilayas.find((x) => x.code === u.code);
       if (!w) throw fail(404, "Wilaya does not exist");
-      Object.assign(w, { ...(u.homeFee !== undefined && { homeFee: u.homeFee }), ...(u.deskFee !== undefined && { deskFee: u.deskFee }), ...(u.active !== undefined && { active: u.active }) });
+      Object.assign(w, { ...(u.homeFee !== undefined && { homeFee: u.homeFee }), ...(u.deskFee !== undefined && { deskFee: u.deskFee }), ...(u.homeCost !== undefined && { homeCost: u.homeCost }), ...(u.deskCost !== undefined && { deskCost: u.deskCost }), ...(u.active !== undefined && { active: u.active }) });
     }
     return updates.length;
+  },
+  async getProfit(_t, range) {
+    const today = new Date().toISOString().slice(0, 10);
+    const from = range.from ?? today.slice(0, 8) + "01";
+    const to = range.to ?? today;
+    const exp = db().expenses.filter((e) => e.spentOn >= from && e.spentOn <= to);
+    const byCat = new Map<Expense["category"], number>();
+    for (const e of exp) byCat.set(e.category, (byCat.get(e.category) ?? 0) + e.amount);
+    const total = exp.reduce((n, e) => n + e.amount, 0);
+    // Demo numbers: a month of sales with returns.
+    const s = db().profitSettings;
+    const sales = 1_240_000, shipping = 96_000, productCost = 682_000, deliveryCost = 71_000, returnedOrders = 6, deliveredOrders = 141;
+    const deliveryLoss = returnedOrders * 400, returnFees = returnedOrders * s.returnFee;
+    const report: ProfitReport = {
+      from, to,
+      delivered: { orders: deliveredOrders, sales, shippingCollected: shipping, productCost, deliveryCost, cardFees: 0 },
+      returned: { orders: returnedOrders, deliveryLoss, returnFees, lostGoods: 0 },
+      expenses: { total, byCategory: [...byCat].map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount) },
+      netProfit: sales + shipping - productCost - deliveryCost - deliveryLoss - returnFees - total,
+      returnRatePercent: Math.round((returnedOrders / (deliveredOrders + returnedOrders)) * 100),
+      warnings: { itemsWithoutCost: 0, activeWilayasWithoutDeliveryCost: 0 },
+    };
+    return report;
+  },
+  async listExpenses(_t, range) {
+    const today = new Date().toISOString().slice(0, 10);
+    const from = range.from ?? today.slice(0, 8) + "01";
+    const to = range.to ?? today;
+    return db().expenses.filter((e) => e.spentOn >= from && e.spentOn <= to).sort((a, b) => b.spentOn.localeCompare(a.spentOn));
+  },
+  async saveExpense(_t, id, input) {
+    const row: Expense = { id: id ?? newId("ex"), spentOn: input.spentOn, category: input.category, platform: input.platform ?? null, amount: input.amount, note: input.note ?? null };
+    const i = db().expenses.findIndex((e) => e.id === id);
+    if (id && i < 0) throw fail(404, "Expense not found");
+    if (i >= 0) db().expenses[i] = row;
+    else db().expenses.push(row);
+    return row;
+  },
+  async deleteExpense(_t, id) {
+    db().expenses = db().expenses.filter((e) => e.id !== id);
+  },
+  async getProfitSettings() {
+    return db().profitSettings;
+  },
+  async saveProfitSettings(_t, input) {
+    db().profitSettings = input;
   },
   async getDelivery() {
     return { provider: db().deliveryProvider, providers: [{ id: "manual", name: "Manual", configured: true }, { id: "yalidine", name: "Yalidine", configured: true }] };

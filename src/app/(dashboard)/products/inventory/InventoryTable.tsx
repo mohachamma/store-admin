@@ -10,7 +10,7 @@ import type { AdminVariantRow, BulkVariantUpdate } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { bulkUpdateAction } from "../actions";
 
-type Edit = { price?: string; compare?: string; stock?: string };
+type Edit = { price?: string; compare?: string; stock?: string; cost?: string };
 const digits = (s: string) => s.replace(/\D/g, "");
 const cell = "h-9 w-full rounded-lg px-2 text-center";
 
@@ -27,6 +27,7 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
     price: edits[r.variantId]?.price ?? String(r.price),
     compare: edits[r.variantId]?.compare ?? (r.compareAtPrice ? String(r.compareAtPrice) : ""),
     stock: edits[r.variantId]?.stock ?? String(r.stock),
+    cost: edits[r.variantId]?.cost ?? (r.costPrice === null ? "" : String(r.costPrice)),
   });
   const set = (id: string, patch: Edit) => setEdits((e) => ({ ...e, [id]: { ...e[id], ...patch } }));
 
@@ -37,6 +38,8 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
     const compare = v.compare.trim() ? Number(v.compare) : null;
     if (compare !== r.compareAtPrice) u.compareAtPrice = compare;
     if (v.stock !== "" && Number(v.stock) !== r.stock) u.stock = Number(v.stock);
+    const cost = v.cost.trim() ? Number(v.cost) : null;
+    if (cost !== r.costPrice) u.costPrice = cost;
     return Object.keys(u).length > 1 ? [u] : [];
   });
 
@@ -87,7 +90,7 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
           const v = val(r);
           const dirty = Boolean(edits[r.variantId]);
           return (
-            <li key={r.variantId} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[2fr_repeat(3,7rem)]", dirty && "bg-primary/10")}>
+            <li key={r.variantId} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[2fr_repeat(4,7rem)]", dirty && "bg-primary/10")}>
               <div className="flex min-w-0 items-center gap-3">
                 <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary p-1">
                   {r.image ? (
@@ -100,9 +103,10 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
                   <p className="text-xs text-muted-foreground" dir="ltr">{r.size}{r.color ? ` · ${r.color}` : ""}</p>
                 </div>
               </div>
-              <div className="col-span-2 grid grid-cols-3 gap-2 md:col-span-3">
+              <div className="col-span-2 grid grid-cols-4 gap-2 md:col-span-4">
                 <Input aria-label="price" className={cell} dir="ltr" inputMode="numeric" value={v.price} onChange={(e) => set(r.variantId, { price: digits(e.target.value) })} />
                 <Input aria-label="compare" className={cell} dir="ltr" inputMode="numeric" placeholder="—" value={v.compare} onChange={(e) => set(r.variantId, { compare: digits(e.target.value) })} />
+                <Input aria-label="cost" className={cell} dir="ltr" inputMode="numeric" placeholder={t("costPlaceholder")} title={t("costHint")} value={v.cost} onChange={(e) => set(r.variantId, { cost: digits(e.target.value) })} />
                 <Input aria-label="stock" className={cn(cell, Number(v.stock) <= 3 && "text-destructive")} dir="ltr" inputMode="numeric" value={v.stock} onChange={(e) => set(r.variantId, { stock: digits(e.target.value) })} />
               </div>
             </li>
