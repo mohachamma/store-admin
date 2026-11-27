@@ -71,6 +71,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 - [x] **Women's page** (2026-12-01): product field "who is this for" (women / men / all) in the product form and a one-tap select on each product row; "Women's page" section on `/content` (show/hide, title + subtitle ar/fr/en, cover image).
 - [x] **Men's page** (2026-12-02): "Men's page" section on `/content` next to the Women's page (same form: show/hide, title + subtitle ar/fr/en, cover image).
 - [x] **SEO texts** (2026-12-03): shop title and description for Google / social cards (ar/fr/en) in the "Pages & contact" screen.
+- [x] **Color swatches** (2026-12-05): in the product form each variant has a round color picker (20 common colors + any exact color; one color = one dot for all its sizes) and each photo can be linked to a color ("Color of this photo").
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.
