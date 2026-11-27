@@ -14,7 +14,7 @@ export async function Topbar() {
   return (
     <header className="sticky top-0 z-30 print:hidden bg-background/85 backdrop-blur">
       <div className="flex h-14 items-center justify-between gap-3 px-4 lg:h-16 lg:px-8">
-        <AdminLogo className="lg:hidden" />
+        <AdminLogo />
         <div className="hidden lg:block">
           {usingMock ? <Badge variant="warning">{tc("mockMode")}</Badge> : null}
         </div>

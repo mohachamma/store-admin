@@ -24,7 +24,7 @@ The owner speaks Arabic — reply to him in Arabic. Code, comments and commit me
 - Works well on a **phone** (the owner will often use it from his phone): responsive tables → cards on small screens.
 
 ## Design
-Warm cream background, soft rounded cards, serif headings, gold accents, dark charcoal pill buttons (`src/config/brand.ts` + tokens in `globals.css`; placeholder name "Store"). Mobile-first.
+Dark frosted glass: warm charcoal background with an orange glow, translucent blurred cards, orange accent and pill buttons, floating icon sidebar, Poppins headings (`src/config/brand.ts` + tokens in `globals.css`; placeholder name "Store"). Mobile-first.
 
 ## Features
 - **Overview:** new orders today, revenue (today / week / month), top products, low-stock alerts, orders by status.
@@ -72,7 +72,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 - [x] **Men's page** (2026-12-02): "Men's page" section on `/content` next to the Women's page (same form: show/hide, title + subtitle ar/fr/en, cover image).
 - [x] **SEO texts** (2026-12-03): shop title and description for Google / social cards (ar/fr/en) in the "Pages & contact" screen.
 - [x] **Color swatches** (2026-12-05): in the product form each variant has a round color picker (20 common colors + any exact color; one color = one dot for all its sizes) and each photo can be linked to a color ("Color of this photo").
-- [x] **New visual identity** (2026-12-05): warm cream palette, soft cards with organic corners, serif headings (Playfair Display / Noto Naskh Arabic), gold accents, icon-over-label sidebar. Tokens live in `src/app/globals.css` + `src/config/brand.ts`; behaviour unchanged. The dashboard no longer shares the storefront's black/white look.
+- [x] **New visual identity** (2026-12-05): dark frosted-glass look from the owner's reference — warm charcoal background with an orange glow, translucent blurred cards, orange accent (active items, primary buttons), floating icon-only pill sidebar (floating pill bar on mobile), Poppins headings. Tokens live in `src/app/globals.css` + `src/config/brand.ts` (`--ink` is the orange accent, `--paper` the dark base); behaviour unchanged. The dashboard no longer shares the storefront's black/white look.
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.

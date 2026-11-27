@@ -21,7 +21,7 @@ function SheetContent({
       <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-[fade-in_.2s_ease]" />
       <SheetPrimitive.Content
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background p-5 shadow-2xl outline-none",
+          "fixed z-50 flex flex-col gap-4 border border-border/60 bg-popover p-5 shadow-2xl outline-none",
           side === "bottom" && "inset-x-0 bottom-0 max-h-[85svh] rounded-t-[28px] pb-[calc(1.25rem+env(safe-area-inset-bottom))] data-[state=open]:animate-[sheet-up_.25s_ease]",
           side === "start" && "inset-y-0 start-0 w-80 max-w-[85vw]",
           className,

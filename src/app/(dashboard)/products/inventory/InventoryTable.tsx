@@ -87,7 +87,7 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
           const v = val(r);
           const dirty = Boolean(edits[r.variantId]);
           return (
-            <li key={r.variantId} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[2fr_repeat(3,7rem)]", dirty && "bg-amber-50")}>
+            <li key={r.variantId} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[2fr_repeat(3,7rem)]", dirty && "bg-primary/10")}>
               <div className="flex min-w-0 items-center gap-3">
                 <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary p-1">
                   {r.image ? (
@@ -111,7 +111,7 @@ export function InventoryTable({ rows }: { rows: AdminVariantRow[] }) {
       </ul>
 
       <div className="sticky bottom-[calc(var(--bottombar-h)+env(safe-area-inset-bottom)+0.5rem)] z-10 flex items-center justify-between gap-3 rounded-full border border-border bg-background/95 p-2 ps-5 shadow-lg backdrop-blur lg:bottom-4">
-        <span className={cn("text-xs", message ? (message.ok ? "text-emerald-700" : "text-destructive") : "text-muted-foreground")} role={message && !message.ok ? "alert" : undefined}>
+        <span className={cn("text-xs", message ? (message.ok ? "text-emerald-400" : "text-destructive") : "text-muted-foreground")} role={message && !message.ok ? "alert" : undefined}>
           {message ? message.text : changes.length ? t("unsaved", { n: changes.length }) : ""}
         </span>
         <Button type="button" size="lg" onClick={save} disabled={pending || changes.length === 0}>

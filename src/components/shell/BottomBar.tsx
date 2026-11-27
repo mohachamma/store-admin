@@ -27,14 +27,14 @@ export function BottomBar() {
   return (
     <nav
       aria-label={t("menu")}
-      className="fixed inset-x-0 bottom-0 z-40 print:hidden rounded-t-[1.75rem] border-t border-border/60 bg-sidebar/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_28px_rgb(70_50_25/0.08)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden mx-3 mb-3 rounded-full border border-border bg-[#1c1714]/80 pb-0 shadow-[0_10px_36px_rgb(0_0_0/0.5)] backdrop-blur-xl lg:hidden"
     >
-      <div className="flex h-[var(--bottombar-h)] items-stretch px-2">
+      <div className="flex h-16 items-stretch px-2">
         {primary.map(({ key, href, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (
             <Link key={key} href={href} aria-current={active ? "page" : undefined} className={cn(cell, active ? "text-foreground" : "text-muted-foreground")}>
-              <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", active && "bg-surface text-gold shadow-[var(--shadow-card)]")}>
+              <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", active && "bg-ink text-paper shadow-[0_6px_18px_rgb(244_122_32/0.45)]")}>
                 <Icon className="size-[18px]" strokeWidth={1.8} />
               </span>
               {t(key)}
@@ -43,7 +43,7 @@ export function BottomBar() {
         })}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger className={cn(cell, moreActive ? "text-foreground" : "text-muted-foreground")}>
-            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-surface text-gold shadow-[var(--shadow-card)]")}>
+            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-ink text-paper")}>
               <Ellipsis className="size-[18px]" strokeWidth={1.8} />
             </span>
             {t("more")}
@@ -58,7 +58,7 @@ export function BottomBar() {
                   onClick={() => setOpen(false)}
                   className={cn(
                     "flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl text-xs font-medium transition",
-                    isActive(pathname, href) ? "bg-surface text-gold shadow-[var(--shadow-card)]" : "bg-surface/60 hover:bg-surface",
+                    isActive(pathname, href) ? "bg-ink text-paper" : "bg-white/5 hover:bg-white/10",
                   )}
                 >
                   <Icon className="size-5" strokeWidth={1.8} />

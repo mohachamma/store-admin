@@ -17,12 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const statusOrder: OrderStatus[] = ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned"];
 const statusColor: Record<OrderStatus, string> = {
-  pending: "bg-[#d9a441]",
-  confirmed: "bg-[#7a9cb5]",
-  shipped: "bg-[#8c7bb0]",
-  delivered: "bg-ink",
-  cancelled: "bg-stone-300",
-  returned: "bg-[#c9695c]",
+  pending: "bg-amber-400",
+  confirmed: "bg-sky-400",
+  shipped: "bg-violet-400",
+  delivered: "bg-emerald-400",
+  cancelled: "bg-stone-500",
+  returned: "bg-red-400",
 };
 
 export default async function OverviewPage() {
@@ -41,15 +41,15 @@ export default async function OverviewPage() {
 
       {/* KPI row — the black card mirrors the storefront's black pill CTA. */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <div className="col-span-2 blob flex flex-col justify-between gap-4 bg-ink p-6 text-[#fbf8f2] shadow-[var(--shadow-card)]">
+        <div className="col-span-2 blob flex flex-col justify-between gap-4 bg-gradient-to-br from-[#f98b3a] to-[#d4600f] p-6 text-paper shadow-[0_14px_40px_rgb(244_122_32/0.3)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="label text-[#fbf8f2]/60">
+              <p className="label text-paper/70">
                 {t("revenue")} · {t("today")}
               </p>
               <p className="mt-2 font-display text-3xl tracking-wide lg:text-4xl">{money(data.revenue.today)}</p>
             </div>
-            <span className="grid size-9 place-items-center rounded-full bg-[#fbf8f2]/10">
+            <span className="grid size-9 place-items-center rounded-full bg-paper/15">
               <TrendingUp className="size-4" />
             </span>
           </div>
@@ -79,7 +79,7 @@ export default async function OverviewPage() {
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {statusOrder.map((s) => (
               <li key={s}>
-                <Link href={`/orders?status=${s}`} className="block rounded-2xl bg-secondary/70 px-3 py-2.5 transition hover:bg-secondary active:scale-[0.98]">
+                <Link href={`/orders?status=${s}`} className="block rounded-2xl bg-white/5 px-3 py-2.5 transition hover:bg-white/10 active:scale-[0.98]">
                   <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <span className={cn("size-2 rounded-full", statusColor[s])} />
                     {ts(s)}
@@ -143,7 +143,7 @@ export default async function OverviewPage() {
 
 function Kpi({ label, value, hint, icon, href }: { label: string; value: string; hint: string; icon: React.ReactNode; href: string }) {
   return (
-    <Link href={href} className="group blob flex flex-col justify-between gap-3 bg-surface p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5">
+    <Link href={href} className="group blob flex flex-col justify-between gap-3 bg-card p-6 shadow-[var(--shadow-card)] backdrop-blur-xl transition hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-2">
         <p className="label leading-snug text-muted-foreground">{label}</p>
         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-gold-soft text-gold">{icon}</span>
@@ -161,7 +161,7 @@ function Kpi({ label, value, hint, icon, href }: { label: string; value: string;
 
 function MiniKpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[var(--radius-card)] bg-surface px-5 py-3 shadow-[var(--shadow-card)]">
+    <div className="rounded-[var(--radius-card)] bg-card px-5 py-3 shadow-[var(--shadow-card)] backdrop-blur-xl">
       <p className="label text-muted-foreground">{label}</p>
       <p className="mt-1 text-lg font-semibold">{value}</p>
     </div>
