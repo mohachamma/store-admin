@@ -44,6 +44,7 @@ export type AdminSlide = S["AdminSlide"];
 export type AdminDelivery = S["AdminDelivery"];
 export type AdminWhyUs = S["AdminWhyUs"];
 export type AdminWomenPage = S["AdminWomenPage"];
+export type AdminMenPage = S["AdminMenPage"];
 export type Audience = "women" | "men" | "unisex";
 export type AdminInfoPage = S["AdminInfoPage"];
 export type InfoPageInput = S["InfoPageInput"];
@@ -106,6 +107,8 @@ export interface AdminApi {
   setAudience(token: string, ids: string[], audience: Audience): Promise<number>;
   getWomenPage(token: string): Promise<AdminWomenPage>;
   saveWomenPage(token: string, input: AdminWomenPage): Promise<void>;
+  getMenPage(token: string): Promise<AdminMenPage>;
+  saveMenPage(token: string, input: AdminMenPage): Promise<void>;
   listCategories(token: string): Promise<AdminCategory[]>;
   saveCategory(token: string, id: string | null, input: CategoryInput): Promise<AdminCategory>;
   deleteCategory(token: string, id: string): Promise<void>;

@@ -7,11 +7,12 @@ import { I18nFields, SwitchField } from "@/components/form/fields";
 import { ImageField } from "@/components/form/ImageField";
 import { Button } from "@/components/ui/button";
 import type { AdminWomenPage } from "@/lib/api/types";
-import { saveWomenPageAction } from "./home-actions";
+import { saveMenPageAction, saveWomenPageAction } from "./home-actions";
 
-export function WomenPageForm({ value }: { value: AdminWomenPage }) {
-  const t = useTranslations("womenPage");
-  const [state, action, pending] = useActionState(saveWomenPageAction, {});
+/** Settings of the Women's or Men's page: visibility, title, subtitle, cover image. */
+export function AudiencePageForm({ kind, value }: { kind: "women" | "men"; value: AdminWomenPage }) {
+  const t = useTranslations(kind === "women" ? "womenPage" : "menPage");
+  const [state, action, pending] = useActionState(kind === "women" ? saveWomenPageAction : saveMenPageAction, {});
   return (
     <form action={action} className="space-y-5">
       <SwitchField name="enabled" label={t("show")} defaultChecked={value.enabled} />

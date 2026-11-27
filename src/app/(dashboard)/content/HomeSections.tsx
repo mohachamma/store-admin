@@ -11,19 +11,21 @@ import { CardForm } from "./CardForm";
 import { deleteCardAction, deleteSubscriberAction, moveCardAction, saveCardAction } from "./home-actions";
 import { NewsletterForm } from "./NewsletterForm";
 import { WhyUsForm } from "./WhyUsForm";
-import { WomenPageForm } from "./WomenPageForm";
+import { AudiencePageForm } from "./AudiencePageForm";
 
 /** The three home-page sections below the hero: category cards, "why us" and the newsletter (with its subscribers). */
 export async function HomeSections({ token }: { token: string }) {
-  const [t, tw, locale, cards, whyUs, newsletter, subs, women] = await Promise.all([
+  const [t, tw, tm, locale, cards, whyUs, newsletter, subs, women, men] = await Promise.all([
     getTranslations("homeSections"),
     getTranslations("womenPage"),
+    getTranslations("menPage"),
     getLocale() as Promise<"ar" | "fr">,
     api.listHomeCards(token),
     api.getWhyUs(token),
     api.getNewsletter(token),
     api.listSubscribers(token),
     api.getWomenPage(token),
+    api.getMenPage(token),
   ]);
   const round = "grid size-9 place-items-center rounded-full transition hover:bg-secondary disabled:opacity-30";
   return (
@@ -35,7 +37,19 @@ export async function HomeSections({ token }: { token: string }) {
         </div>
         <Card className="max-w-2xl">
           <CardContent>
-            <WomenPageForm value={women} />
+            <AudiencePageForm kind="women" value={women} />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-lg uppercase tracking-[0.08em]">{tm("title")}</h2>
+          <p className="mt-1 max-w-xl text-sm text-muted-foreground">{tm("hint")}</p>
+        </div>
+        <Card className="max-w-2xl">
+          <CardContent>
+            <AudiencePageForm kind="men" value={men} />
           </CardContent>
         </Card>
       </section>

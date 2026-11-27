@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -40,6 +40,7 @@ interface MockDb {
   slides: AdminSlide[];
   whyUs: AdminWhyUs;
   womenPage: AdminWomenPage;
+  menPage: AdminMenPage;
   pages: AdminInfoPage[];
   storeInfo: AdminStoreInfo;
   homeCards: AdminHomeCard[];
@@ -84,6 +85,7 @@ const db = (): MockDb =>
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, active: true })),
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
+    menPage: { enabled: true, title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث ملابس الرجال", fr: "", en: "" }, heroUrl: null },
     womenPage: { enabled: true, title: { ar: "نساء", fr: "Femme", en: "Women" }, subtitle: { ar: "أحدث ملابس النساء", fr: "", en: "" }, heroUrl: null },
     pages: ["terms", "privacy", "returns", "shipping", "cod"].map((slug) => ({ slug, title: { ar: slug, fr: slug, en: slug }, body: { ar: "## مسودة\nنص تجريبي.", fr: "", en: "" }, isPublished: true, isDraft: true, updatedAt: new Date().toISOString() })),
     storeInfo: { phone: "", whatsapp: "", email: "", address: { ar: "", fr: "", en: "" }, hours: { ar: "", fr: "", en: "" } },
@@ -275,6 +277,12 @@ export const mockApi: AdminApi = {
     let n = 0;
     for (const p of db().products) if (ids.includes(p.id)) { p.audience = audience; n++; }
     return n;
+  },
+  async getMenPage() {
+    return db().menPage;
+  },
+  async saveMenPage(_t, input) {
+    db().menPage = input;
   },
   async getWomenPage() {
     return db().womenPage;

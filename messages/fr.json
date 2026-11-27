@@ -532,5 +532,17 @@
     "saved": "Enregistré",
     "titleRequired": "Le titre en arabe est obligatoire.",
     "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
+  },
+  "menPage": {
+    "title": "Page Homme",
+    "hint": "Une page dédiée à la mode masculine, avec un lien « Homme » dans le menu de la boutique. Vous choisissez les produits via le champ « Pour qui ? » de chaque produit.",
+    "show": "Afficher la page Homme et son lien dans la boutique",
+    "pageTitle": "Titre de la page",
+    "pageSubtitle": "Texte sous le titre",
+    "cover": "Image de couverture",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "titleRequired": "Le titre en arabe est obligatoire.",
+    "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
   }
 }

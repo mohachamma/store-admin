@@ -69,6 +69,7 @@ Whatever the storefront shows must be editable here. When `store-web` gets a new
 - [x] **Home sections screens** (2026-11-29) on `/content`: category cards (image, ar/fr/en text, link, reorder, hide), "why us" (6 slots, icon + title + text, show/hide), newsletter block texts + subscribers list (delete on request).
 - [x] **Pages & contact** (2026-11-30) `/pages`: edit the 5 legal pages (title + text in ar/fr/en, published / draft flags) and the store contact details (phone, WhatsApp, email, address, opening hours).
 - [x] **Women's page** (2026-12-01): product field "who is this for" (women / men / all) in the product form and a one-tap select on each product row; "Women's page" section on `/content` (show/hide, title + subtitle ar/fr/en, cover image).
+- [x] **Men's page** (2026-12-02): "Men's page" section on `/content` next to the Women's page (same form: show/hide, title + subtitle ar/fr/en, cover image).
 
 ## Needs from API
 Temporary shapes are in `src/lib/api/types.ts`.

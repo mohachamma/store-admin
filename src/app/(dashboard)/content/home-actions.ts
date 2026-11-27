@@ -100,10 +100,10 @@ export async function deleteSubscriberAction(id: string) {
   revalidatePath("/content");
 }
 
-// ---- Women's page -------------------------------------------------------------------------------------------------
-export async function saveWomenPageAction(_prev: FormState, form: FormData): Promise<FormState> {
+// ---- Women's and men's pages --------------------------------------------------------------------------------------
+async function saveAudiencePage(kind: "women" | "men", form: FormData): Promise<FormState> {
   const token = await requireSession();
-  const t = await getTranslations("womenPage");
+  const t = await getTranslations(kind === "women" ? "womenPage" : "menPage");
   const tf = await getTranslations("form");
   const title = readI18n(form, "title");
   const subtitle = readI18n(form, "subtitle");
@@ -116,10 +116,20 @@ export async function saveWomenPageAction(_prev: FormState, form: FormData): Pro
       if (!file.type.startsWith("image/") || file.size > MAX_IMAGE) return { error: tf("uploadFailed") };
       heroUrl = await api.uploadImage(token, file);
     }
-    await api.saveWomenPage(token, { enabled: form.get("enabled") === "on", title, subtitle, heroUrl });
+    const input = { enabled: form.get("enabled") === "on", title, subtitle, heroUrl };
+    if (kind === "women") await api.saveWomenPage(token, input);
+    else await api.saveMenPage(token, input);
   } catch {
     return { error: tf("saveFailed") };
   }
   revalidatePath("/content");
   return { ok: true, at: Date.now() };
+}
+
+export async function saveWomenPageAction(_prev: FormState, form: FormData): Promise<FormState> {
+  return saveAudiencePage("women", form);
+}
+
+export async function saveMenPageAction(_prev: FormState, form: FormData): Promise<FormState> {
+  return saveAudiencePage("men", form);
 }
