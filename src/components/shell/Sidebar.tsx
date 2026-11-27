@@ -29,7 +29,7 @@ export function Sidebar() {
               title={t(key)}
               className={cn(
                 "grid size-11 place-items-center rounded-full transition",
-                active ? "bg-ink text-paper shadow-[0_6px_18px_rgb(244_122_32/0.45)]" : "text-foreground/70 hover:bg-white/10 hover:text-foreground",
+                active ? "bg-ink text-paper shadow-[0_6px_18px_rgb(244_122_32/0.45)] light:shadow-none" : "text-foreground/70 hover:bg-secondary hover:text-foreground",
               )}
             >
               <Icon className="size-5" strokeWidth={1.7} />
@@ -43,7 +43,7 @@ export function Sidebar() {
         target="_blank"
         rel="noreferrer"
         title={t("openStore")}
-        className="mt-2 grid size-11 place-items-center rounded-full text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+        className="mt-2 grid size-11 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
       >
         <ExternalLink className="size-5" strokeWidth={1.7} />
         <span className="sr-only">{t("openStore")}</span>

@@ -20,7 +20,7 @@ export function AudiencePageForm({ kind, value }: { kind: "women" | "men"; value
       <I18nFields name="subtitle" label={t("pageSubtitle")} defaults={value.subtitle} />
       <ImageField name="hero" label={t("cover")} currentUrl={value.heroUrl} maxSize={1600} />
       {state.error ? <p role="alert" className="text-sm text-destructive">{state.error}</p> : null}
-      {state.ok ? <p role="status" className="text-sm text-emerald-400">{t("saved")}</p> : null}
+      {state.ok ? <p role="status" className="text-sm text-emerald-400 light:text-emerald-700">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : null} {t("save")}</Button>
     </form>
   );

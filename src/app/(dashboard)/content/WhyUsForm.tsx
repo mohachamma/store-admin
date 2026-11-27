@@ -33,7 +33,7 @@ export function WhyUsForm({ value }: { value: AdminWhyUs }) {
       })}
       <p className="text-[11px] text-muted-foreground">{t("emptySlotHint")}</p>
       {state.error ? <p role="alert" className="text-sm text-destructive">{state.error}</p> : null}
-      {state.ok ? <p role="status" className="text-sm text-emerald-400">{t("saved")}</p> : null}
+      {state.ok ? <p role="status" className="text-sm text-emerald-400 light:text-emerald-700">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : null} {t("save")}</Button>
     </form>
   );

@@ -18,7 +18,7 @@ export function NewsletterForm({ value }: { value: AdminNewsletter }) {
       <I18nFields name="subtitle" label={t("newsletterSubtitle")} defaults={value.subtitle} />
       <I18nFields name="button" label={t("newsletterButton")} defaults={value.button} required />
       {state.error ? <p role="alert" className="text-sm text-destructive">{state.error}</p> : null}
-      {state.ok ? <p role="status" className="text-sm text-emerald-400">{t("saved")}</p> : null}
+      {state.ok ? <p role="status" className="text-sm text-emerald-400 light:text-emerald-700">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : null} {t("save")}</Button>
     </form>
   );
