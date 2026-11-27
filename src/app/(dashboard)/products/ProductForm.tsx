@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
+import { ColorSwatchPicker, presetByName } from "@/components/form/ColorSwatchPicker";
 import { I18nFields, readI18n, SwitchField } from "@/components/form/fields";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,8 @@ interface Row {
   id?: string;
   size: string;
   color: string;
+  /** Exact swatch color "#rrggbb" ("" = not chosen). */
+  colorHex: string;
   sku: string;
   stock: string;
   price: string;
@@ -32,7 +35,7 @@ const cell = "h-10 rounded-lg px-2.5 text-center";
 
 let seq = 0;
 const newKey = () => `r${++seq}`;
-const toRow = (v: AdminProduct["variants"][number]): Row => ({ key: newKey(), id: v.id, size: v.size, color: v.color, sku: v.sku ?? "", stock: String(v.stock), price: String(v.price), compare: v.compareAtPrice ? String(v.compareAtPrice) : "" });
+const toRow = (v: AdminProduct["variants"][number]): Row => ({ key: newKey(), id: v.id, size: v.size, color: v.color, colorHex: v.colorHex ?? "", sku: v.sku ?? "", stock: String(v.stock), price: String(v.price), compare: v.compareAtPrice ? String(v.compareAtPrice) : "" });
 
 export function ProductForm({ product, categories, brands }: { product?: AdminProduct; categories: AdminCategory[]; brands: AdminBrand[] }) {
   const t = useTranslations("products");
@@ -40,18 +43,21 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
   const [pending, start] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const [images, setImages] = useState<string[]>(product?.images.map((i) => i.url) ?? []);
+  // Each photo may belong to one color ("" = shown for every color).
+  const [images, setImages] = useState<{ url: string; color: string }[]>(product?.images.map((i) => ({ url: i.url, color: i.color ?? "" })) ?? []);
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [rows, setRows] = useState<Row[]>(product?.variants.map(toRow) ?? []);
   const [error, setError] = useState<string | null>(null);
 
+  // The distinct color names of the variants (used to link photos to colors).
+  const colorNames = [...new Set(rows.map((r) => r.color.trim()).filter(Boolean))];
   const setRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const addSizes = (sizes: string[]) =>
     setRows((rs) => {
       const have = new Set(rs.map((r) => `${r.size.toLowerCase()}|${r.color.toLowerCase()}`));
       const template = rs[0];
-      const added = sizes.filter((s) => !have.has(`${s.toLowerCase()}|${(template?.color ?? "").toLowerCase()}`)).map((size): Row => ({ key: newKey(), size, color: template?.color ?? "", sku: "", stock: "0", price: template?.price ?? "", compare: template?.compare ?? "" }));
+      const added = sizes.filter((s) => !have.has(`${s.toLowerCase()}|${(template?.color ?? "").toLowerCase()}`)).map((size): Row => ({ key: newKey(), size, color: template?.color ?? "", colorHex: template?.colorHex ?? "", sku: "", stock: "0", price: template?.price ?? "", compare: template?.compare ?? "" }));
       return [...rs, ...added];
     });
 
@@ -72,7 +78,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
         setImageError(true);
       }
     }
-    setImages((prev) => [...prev, ...urls].slice(0, MAX_IMAGES));
+    setImages((prev) => [...prev, ...urls.map((url) => ({ url, color: "" }))].slice(0, MAX_IMAGES));
     setUploading(false);
     if (fileInput.current) fileInput.current.value = "";
   }
@@ -106,7 +112,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
       const k = `${r.size.trim().toLowerCase()}|${r.color.trim().toLowerCase()}`;
       if (seen.has(k)) return setError(t("errors.duplicate"));
       seen.add(k);
-      variants.push({ id: r.id, size: r.size.trim(), color: r.color.trim(), sku: r.sku.trim() || null, stock: Math.max(0, Math.floor(Number(r.stock) || 0)), price, compareAtPrice: compare });
+      variants.push({ id: r.id, size: r.size.trim(), color: r.color.trim(), colorHex: r.colorHex || null, sku: r.sku.trim() || null, stock: Math.max(0, Math.floor(Number(r.stock) || 0)), price, compareAtPrice: compare });
     }
     if (isPublished && variants.length === 0) return setError(t("errors.needVariant"));
     if (isPublished && images.length === 0) return setError(t("errors.needImage"));
@@ -114,7 +120,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
     setError(null);
     start(async () => {
       const r = await saveProductAction(product?.id ?? null, {
-        name, description, categoryId, brandId: String(f.get("brandId") ?? "") || null, isPublished, isNew: f.get("isNew") === "on", audience: (["women", "men"].includes(String(f.get("audience"))) ? String(f.get("audience")) : "unisex") as "women" | "men" | "unisex", images, variants,
+        name, description, categoryId, brandId: String(f.get("brandId") ?? "") || null, isPublished, isNew: f.get("isNew") === "on", audience: (["women", "men"].includes(String(f.get("audience"))) ? String(f.get("audience")) : "unisex") as "women" | "men" | "unisex", images: images.map((i) => i.url), imageColors: images.map((i) => i.color || null), variants,
       });
       if (r.ok) return router.push("/products");
       setError(r.code === "conflict" ? t("errors.sku") : `${t("errors.generic")}${r.message ? ` (${r.message})` : ""}`);
@@ -172,7 +178,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
             </button>
           ) : (
             <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {images.map((url, i) => (
+              {images.map(({ url, color }, i) => (
                 <li key={url} className="space-y-1.5">
                   <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-secondary">
                     {/* eslint-disable-next-line @next/next/no-img-element -- admin preview of uploaded photos */}
@@ -186,6 +192,14 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
                     <button type="button" disabled={i === 0} onClick={() => moveImage(i, -1)} aria-label={t("moveEarlier")} title={t("moveEarlier")} className="grid size-8 place-items-center rounded-full hover:bg-secondary disabled:opacity-30"><ChevronLeft className="size-4 rtl:rotate-180" /></button>
                     <button type="button" disabled={i === images.length - 1} onClick={() => moveImage(i, 1)} aria-label={t("moveLater")} title={t("moveLater")} className="grid size-8 place-items-center rounded-full hover:bg-secondary disabled:opacity-30"><ChevronRight className="size-4 rtl:rotate-180" /></button>
                   </div>
+                  {colorNames.length > 0 ? (
+                    <select value={color} onChange={(e) => setImages((l) => l.map((x, k) => (k === i ? { ...x, color: e.target.value } : x)))} aria-label={t("imageColor")} className="h-8 w-full rounded-lg bg-secondary px-2 text-[11px]">
+                      <option value="">{t("allColors")}</option>
+                      {colorNames.map((n) => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                    </select>
+                  ) : null}
                 </li>
               ))}
               {uploading ? <li className="grid aspect-[4/5] place-items-center rounded-xl bg-secondary"><Loader2 className="size-5 animate-spin text-muted-foreground" /></li> : null}
@@ -199,7 +213,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
       <Card>
         <CardHeader>
           <CardTitle>{t("variantsTitle")}</CardTitle>
-          <Button type="button" variant="outline" size="sm" onClick={() => setRows((rs) => [...rs, { key: newKey(), size: "", color: rs[0]?.color ?? "", sku: "", stock: "0", price: rs[0]?.price ?? "", compare: rs[0]?.compare ?? "" }])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => setRows((rs) => [...rs, { key: newKey(), size: "", color: rs[0]?.color ?? "", colorHex: rs[0]?.colorHex ?? "", sku: "", stock: "0", price: rs[0]?.price ?? "", compare: rs[0]?.compare ?? "" }])}>
             <Plus /> {t("addVariant")}
           </Button>
         </CardHeader>
@@ -222,7 +236,30 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
               {rows.map((r) => (
                 <div key={r.key} className="grid grid-cols-3 gap-2 rounded-2xl border border-border p-2 md:grid-cols-[1fr_1fr_1.2fr_.8fr_1fr_1fr_2rem] md:border-0 md:p-0">
                   <Field label={t("size")}><Input className={cell} dir="ltr" value={r.size} maxLength={10} onChange={(e) => setRow(r.key, { size: e.target.value })} /></Field>
-                  <Field label={t("color")}><Input className={cell} value={r.color} maxLength={40} onChange={(e) => setRow(r.key, { color: e.target.value })} /></Field>
+                  <Field label={t("color")}>
+                    <div className="flex items-center gap-1.5">
+                      <ColorSwatchPicker
+                        value={r.colorHex}
+                        onChange={(hex, preset) =>
+                          // One color has one dot: apply it to every row with the same color name (and name the color when a preset is chosen).
+                          setRows((rs) => {
+                            const name = r.color.trim() || preset || "";
+                            return rs.map((x) => (x.key === r.key || (name && x.color.trim().toLowerCase() === name.toLowerCase()) ? { ...x, color: x.key === r.key ? name : x.color, colorHex: hex } : x));
+                          })
+                        }
+                      />
+                      <Input
+                        className={cn(cell, "min-w-0 flex-1")}
+                        value={r.color}
+                        maxLength={40}
+                        onChange={(e) => {
+                          const name = e.target.value;
+                          const known = presetByName(name);
+                          setRow(r.key, { color: name, ...(known && !r.colorHex ? { colorHex: known.hex } : {}) });
+                        }}
+                      />
+                    </div>
+                  </Field>
                   <Field label={t("sku")}><Input className={cell} dir="ltr" value={r.sku} maxLength={40} onChange={(e) => setRow(r.key, { sku: e.target.value })} /></Field>
                   <Field label={t("stockLabel")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.stock} onChange={(e) => setRow(r.key, { stock: e.target.value.replace(/\D/g, "") })} /></Field>
                   <Field label={t("price")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.price} onChange={(e) => setRow(r.key, { price: e.target.value.replace(/\D/g, "") })} /></Field>

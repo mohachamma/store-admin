@@ -145,8 +145,8 @@ function sampleCatalog() {
   const categories = [cat("outerwear", "ملابس خارجية", "Vestes & manteaux", "Outerwear"), cat("tops", "قمصان وتيشرتات", "Hauts", "Tops"), cat("footwear", "أحذية", "Chaussures", "Footwear"), cat("bottoms", "سراويل", "Bas", "Bottoms")];
   const p = (slug: string, ar: string, fr: string, en: string, categoryId: string, art: string, price: number, compare: number | null, sizes: string[], pub = true): AdminProduct => ({
     id: `p_${slug}`, slug, name: { ar, fr, en }, description: { ar: "", fr: "", en: "" }, categoryId, brandId: null, isPublished: pub, isNew: false, audience: "unisex",
-    images: [{ url: `/placeholders/${art}.svg` }],
-    variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare })),
+    images: [{ url: `/placeholders/${art}.svg`, color: null }],
+    variants: sizes.map((size, i) => ({ id: `v_${slug}_${size}`, size, color: "", colorHex: null, sku: `${slug}-${size}`.toUpperCase(), stock: i === 0 ? 1 : 4 + i, price, compareAtPrice: compare })),
   });
   const products = [
     p("nylon-zip-hoodie", "هودي بسحاب نايلون", "Hoodie zippé en nylon", "Nylon Full Zip Hoodie", "c_outerwear", "hoodie-stone", 7900, null, ["XS", "S", "M", "L", "XL"]),
@@ -256,8 +256,8 @@ export const mockApi: AdminApi = {
     const product: AdminProduct = {
       id: old?.id ?? newId("p"), slug: old?.slug ?? slugOf(input.name, "product"), name: { ...input.name }, description: { ar: input.description?.ar ?? "", fr: input.description?.fr ?? "", en: input.description?.en ?? "" },
       categoryId: input.categoryId, brandId: input.brandId ?? null, isPublished: input.isPublished ?? false, isNew: input.isNew ?? false, audience: input.audience ?? "unisex",
-      images: (input.images ?? []).map((url) => ({ url })),
-      variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null })),
+      images: (input.images ?? []).map((url, i) => ({ url, color: input.imageColors?.[i] ?? null })),
+      variants: (input.variants ?? []).map((v) => ({ id: v.id ?? newId("v"), size: v.size, color: v.color ?? "", colorHex: v.colorHex ?? null, sku: v.sku?.trim() ? v.sku.trim().toUpperCase() : null, stock: v.stock, price: v.price, compareAtPrice: v.compareAtPrice ?? null })),
     };
     if (old) d.products[d.products.indexOf(old)] = product;
     else d.products.unshift(product);

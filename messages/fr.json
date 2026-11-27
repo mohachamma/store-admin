@@ -307,7 +307,9 @@
     "audienceUnisex": "Tous",
     "audienceWomen": "Femme",
     "audienceMen": "Homme",
-    "audienceHint": "« Femme » et « Tous » apparaissent sur la page Femme."
+    "audienceHint": "« Femme » et « Tous » apparaissent sur la page Femme.",
+    "imageColor": "Couleur de cette photo",
+    "allColors": "Toutes les couleurs"
   },
   "inventory": {
     "title": "Stock et prix",
@@ -548,5 +550,29 @@
     "saved": "Enregistré",
     "titleRequired": "Le titre en arabe est obligatoire.",
     "arabicNeeded": "Si vous écrivez en français ou en anglais, le texte arabe est obligatoire aussi."
+  },
+  "colors": {
+    "choose": "Choisir la couleur",
+    "custom": "Autre couleur exacte",
+    "black": "Noir",
+    "white": "Blanc",
+    "cream": "Crème",
+    "beige": "Beige",
+    "sand": "Sable",
+    "stone": "Pierre",
+    "grey": "Gris",
+    "charcoal": "Anthracite",
+    "navy": "Marine",
+    "blue": "Bleu",
+    "denim": "Denim",
+    "red": "Rouge",
+    "burgundy": "Bordeaux",
+    "pink": "Rose",
+    "orange": "Orange",
+    "yellow": "Jaune",
+    "green": "Vert",
+    "olive": "Olive",
+    "brown": "Marron",
+    "purple": "Violet"
   }
 }
