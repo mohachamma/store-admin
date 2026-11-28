@@ -55,6 +55,7 @@ export type AdminNewsletter = S["AdminNewsletter"];
 export type NewsletterSubscribers = S["NewsletterSubscribers"];
 export type SlideInput = S["SlideInput"];
 export type WhatsappMessages = S["WhatsappMessages"];
+export type AdsReport = S["AdsReport"];
 export type ProfitReport = S["ProfitReport"];
 export type Expense = S["Expense"];
 export type ExpenseInput = S["ExpenseInput"];
@@ -137,6 +138,7 @@ export interface AdminApi {
   updateWilayas(token: string, updates: WilayaUpdate[]): Promise<number>;
   setFreeShipping(token: string, over: number | null): Promise<void>;
   getProfit(token: string, range: DateRange, locale: string): Promise<ProfitReport>;
+  getAds(token: string, range: DateRange): Promise<AdsReport>;
   listExpenses(token: string, range: DateRange): Promise<Expense[]>;
   saveExpense(token: string, id: string | null, input: ExpenseInput): Promise<Expense>;
   deleteExpense(token: string, id: string): Promise<void>;

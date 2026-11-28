@@ -21,6 +21,7 @@ export async function saveExpenseAction(_prev: FormState, form: FormData): Promi
       spentOn,
       category,
       platform: String(form.get("platform") ?? "").trim() || null,
+      campaign: String(form.get("campaign") ?? "").trim() || null,
       amount,
       note: String(form.get("note") ?? "").trim() || null,
     });

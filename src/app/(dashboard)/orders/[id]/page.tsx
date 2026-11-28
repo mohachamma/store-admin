@@ -76,6 +76,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 {o.discountTotal > 0 ? <Line k={`${t("discount")}${o.discountCode ? ` (${o.discountCode})` : ""}`} v={`-${money(o.discountTotal)}`} /> : null}
                 <div className="flex items-center justify-between border-t border-border pt-3 text-base font-semibold"><dt>{t("total")}</dt><dd>{money(o.total)}</dd></div>
                 <Line k={t("payment")} v={`${t(o.paymentMethod)} · ${t(o.paymentStatus)}`} />
+                <Line k={t("adFrom")} v={o.ad ? [o.ad.source, o.ad.campaign, o.ad.content].filter(Boolean).join(" · ") || o.ad.medium : t("noAd")} />
               </dl>
             </CardContent>
           </Card>

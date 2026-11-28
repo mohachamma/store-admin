@@ -24,7 +24,8 @@
     "brands": "Marques",
     "offers": "Offres & promos",
     "pages": "Pages et contact",
-    "profit": "Bénéfice net"
+    "profit": "Bénéfice net",
+    "ads": "Publicités"
   },
   "login": {
     "title": "Connexion",
@@ -234,7 +235,9 @@
     "sendTracking": "Envoyer le suivi au client sur WhatsApp",
     "sendTrackingHint": "Les données du client viennent d'être effacées : c'est la seule occasion de lui envoyer le message de suivi (déjà rédigé, il ne reste qu'à envoyer).",
     "doneWithoutSending": "Terminé, fermer sans envoyer",
-    "openAtCarrier": "Ouvrir le colis chez le transporteur"
+    "openAtCarrier": "Ouvrir le colis chez le transporteur",
+    "adFrom": "Publicité",
+    "noAd": "Sans publicité"
   },
   "notifications": {
     "title": "Notifications",
@@ -674,6 +677,46 @@
     "byProduct": "Bénéfice par produit",
     "byProductHint": "Le coût d'un retour reste sur le produit; quand il est revendu, son bénéfice tient compte de ce que le retour a coûté. Avant publicité et autres dépenses.",
     "noProducts": "Aucune vente livrée sur cette période.",
-    "productLine": "Vendus {sold} · retournés {returned} · ventes {sales} · coût {cost} · livraison {delivery} · perte retour {loss}"
+    "productLine": "Vendus {sold} · retournés {returned} · ventes {sales} · coût {cost} · livraison {delivery} · perte retour {loss}",
+    "campaign": "Nom de la campagne (publicité)",
+    "campaignHint": "Le même nom que dans le lien de la publicité, pour comparer la dépense aux ventes dans la page « Publicités »."
+  },
+  "ads": {
+    "title": "Publicités",
+    "subtitle": "Sachez quelle publicité a amené chaque commande, ce que vous avez dépensé et ce que vous avez vraiment gagné.",
+    "builderTitle": "Créer le lien de la publicité",
+    "builderHint": "Mettez ce lien dans votre publicité à la place du lien normal de la boutique. Chaque commande qui en vient retient la plateforme et la campagne. Créez un lien différent par campagne.",
+    "platform": "Plateforme",
+    "otherPlatform": "Autre",
+    "otherPlaceholder": "Nom de la plateforme",
+    "campaign": "Nom de la campagne",
+    "content": "Nom de l'annonce ou de la vidéo (facultatif)",
+    "page": "Page ouverte par le client",
+    "pageHint": "Laissez « / » pour l'accueil, ou mettez le chemin d'un produit, ex. /fr/products/nom-du-produit.",
+    "link": "Lien",
+    "fillFirst": "Saisissez le nom de la campagne pour voir le lien",
+    "copy": "Copier",
+    "copied": "Copié",
+    "resultsTitle": "Résultats des campagnes",
+    "period": {
+      "month": "Ce mois",
+      "last": "Mois dernier",
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "custom": "Période libre"
+    },
+    "from": "Du",
+    "to": "Au",
+    "totalSpend": "Dépensé en publicité",
+    "totalSales": "Ventes des commandes livrées",
+    "totalProfit": "Bénéfice avant publicité",
+    "totalNet": "Bénéfice après publicité",
+    "direct": "Sans publicité (visite directe ou recherche)",
+    "orderLine": "{orders} commande(s) · {delivered} livrée(s) · {returned} retournée(s) · {progress} en cours",
+    "moneyLine": "Dépense {spend} · ventes {sales} · bénéfice {profit}",
+    "roas": "1 DA de pub a rapporté {n} DA de ventes",
+    "perOrder": "coût par commande {n}",
+    "empty": "Aucune commande ni dépense publicitaire sur cette période.",
+    "rule": "Sont comptées les commandes passées pendant la période. Le bénéfice ne tient compte que des commandes livrées ou retournées; les autres apparaissent « en cours » et n'entrent pas dans l'argent tant qu'elles ne sont pas livrées. La dépense vient de « Dépenses » (Bénéfice net) avec la même plateforme et la même campagne."
   }
 }

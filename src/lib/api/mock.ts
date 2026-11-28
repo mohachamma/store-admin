@@ -89,9 +89,9 @@ const db = (): MockDb =>
       [16, "الجزائر", "Alger", 500, 350], [31, "وهران", "Oran", 700, 450], [25, "قسنطينة", "Constantine", 700, 450], [9, "البليدة", "Blida", 500, 350], [19, "سطيف", "Sétif", 800, 550], [30, "ورقلة", "Ouargla", 1200, 800],
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, homeCost: Math.round((homeFee as number) * 0.7), deskCost: Math.round((deskFee as number) * 0.7), active: true })),
     expenses: [
-      { id: "ex_1", spentOn: new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "facebook", amount: 18_000, note: null },
-      { id: "ex_2", spentOn: new Date(Date.now() - 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "tiktok", amount: 9_500, note: null },
-      { id: "ex_3", spentOn: new Date().toISOString().slice(0, 10), category: "packaging" as const, platform: null, amount: 4_200, note: "Bags" },
+      { id: "ex_1", spentOn: new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "facebook", campaign: "eid_sale", amount: 18_000, note: null },
+      { id: "ex_2", spentOn: new Date(Date.now() - 864e5).toISOString().slice(0, 10), category: "ads" as const, platform: "tiktok", campaign: "new_hoodies", amount: 9_500, note: null },
+      { id: "ex_3", spentOn: new Date().toISOString().slice(0, 10), category: "packaging" as const, platform: null, campaign: null, amount: 4_200, note: "Bags" },
     ],
     profitSettings: { returnFee: 200, returnedItemsLost: false, cardFeePercent: 0 },
     whatsapp: {
@@ -140,6 +140,7 @@ function sampleOrders(): MockOrder[] {
       id: `o_${n}`, orderNumber: n, status, paymentMethod: "cod", paymentStatus: status === "delivered" ? "paid" : "unpaid", deliveryType: "home", wilayaCode, wilaya,
       total: subtotal + fee, itemCount: items.reduce((t, i) => t + i.quantity, 0), trackingNumber: pending ? null : `YAL-${n * 7}`, createdAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
       customerName: pending && who ? who.name : null, customerPhone: pending && who ? who.phone : null,
+      ad: n % 3 === 0 ? null : { source: n % 3 === 1 ? "facebook" : "tiktok", medium: "paid", campaign: n % 3 === 1 ? "eid_sale" : "new_hoodies", content: null },
       subtotal, shippingFee: fee, discountTotal: 0, discountCode: null, deliveryCompany: pending ? null : "yalidine", deliveryStatus: pending ? null : "created",
       confirmedAt: pending ? null : new Date(Date.now() - (hoursAgo - 1) * 3600_000).toISOString(), items,
       contact: pending && who ? { ...who, daira: null } : null,
@@ -195,7 +196,7 @@ const orderById = (id: string) => {
 };
 const rowOf = (o: MockOrder): AdminOrderRow => ({
   id: o.id, orderNumber: o.orderNumber, status: o.status, paymentMethod: o.paymentMethod, paymentStatus: o.paymentStatus, deliveryType: o.deliveryType, wilayaCode: o.wilayaCode,
-  wilaya: o.wilaya, total: o.total, itemCount: o.itemCount, trackingNumber: o.trackingNumber, createdAt: o.createdAt, customerName: o.customerName, customerPhone: o.customerPhone,
+  wilaya: o.wilaya, total: o.total, itemCount: o.itemCount, trackingNumber: o.trackingNumber, createdAt: o.createdAt, customerName: o.customerName, customerPhone: o.customerPhone, ad: o.ad,
 });
 const detailOf = (o: MockOrder): AdminOrderDetail => ({
   ...rowOf(o), subtotal: o.subtotal, shippingFee: o.shippingFee, discountTotal: o.discountTotal, discountCode: o.discountCode, deliveryCompany: o.deliveryCompany,
@@ -385,6 +386,19 @@ export const mockApi: AdminApi = {
     }
     return updates.length;
   },
+  async getAds(_t, range) {
+    const today = new Date().toISOString().slice(0, 10);
+    const from = range.from ?? today.slice(0, 8) + "01";
+    const to = range.to ?? today;
+    const spend = (s: string, c: string) => db().expenses.filter((e) => e.category === "ads" && e.platform === s && (e.campaign ?? "") === c && e.spentOn >= from && e.spentOn <= to).reduce((n, e) => n + e.amount, 0);
+    const mk = (source: string, campaign: string, orders: number, delivered: number, returned: number, sales: number, profit: number) => {
+      const sp = spend(source, campaign);
+      return { source, campaign, orders, delivered, returned, inProgress: orders - delivered - returned, sales, profit, spend: sp, netProfit: profit - sp, roas: sp > 0 ? Math.round((sales / sp) * 100) / 100 : null, costPerOrder: sp > 0 && orders > 0 ? Math.round(sp / orders) : null };
+    };
+    const campaigns = [mk("facebook", "eid_sale", 62, 48, 5, 372_000, 131_000), mk("tiktok", "new_hoodies", 31, 22, 4, 168_500, 52_000), mk("", "", 40, 35, 2, 255_000, 98_000)].sort((a, b) => b.netProfit - a.netProfit);
+    const sum = (f: (r: (typeof campaigns)[number]) => number) => campaigns.reduce((n, r) => n + f(r), 0);
+    return { from, to, campaigns, totals: { orders: sum((r) => r.orders), sales: sum((r) => r.sales), profit: sum((r) => r.profit), spend: sum((r) => r.spend), netProfit: sum((r) => r.netProfit) } };
+  },
   async getProfit(_t, range) {
     const demo = [
       { key: "p1", name: "Nylon Full Zip Hoodie", unitsSold: 48, unitsReturned: 2, sales: 379_200, productCost: 211_000, deliveryCost: 21_000, returnLoss: 1_200 },
@@ -421,7 +435,7 @@ export const mockApi: AdminApi = {
     return db().expenses.filter((e) => e.spentOn >= from && e.spentOn <= to).sort((a, b) => b.spentOn.localeCompare(a.spentOn));
   },
   async saveExpense(_t, id, input) {
-    const row: Expense = { id: id ?? newId("ex"), spentOn: input.spentOn, category: input.category, platform: input.platform ?? null, amount: input.amount, note: input.note ?? null };
+    const row: Expense = { id: id ?? newId("ex"), spentOn: input.spentOn, category: input.category, platform: input.platform ?? null, campaign: input.campaign ?? null, amount: input.amount, note: input.note ?? null };
     const i = db().expenses.findIndex((e) => e.id === id);
     if (id && i < 0) throw fail(404, "Expense not found");
     if (i >= 0) db().expenses[i] = row;
