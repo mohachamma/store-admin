@@ -186,7 +186,7 @@
     "address": "Adresse",
     "call": "Appeler",
     "whatsapp": "WhatsApp",
-    "pendingHint": "Appelez le client pour vérifier la commande, puis confirmez-la avec le numéro de suivi.",
+    "pendingHint": "Appuyez sur « Demander sur WhatsApp » : un texte prêt lui demande s'il confirme. Quand il accepte, confirmez la commande ci-dessous (ou appelez-le).",
     "products": "Articles",
     "subtotal": "Sous-total",
     "shipping": "Livraison",
@@ -228,7 +228,13 @@
     "next": "Suivant",
     "confirmAutoHint": "Le serveur envoie le colis à {company} automatiquement et enregistre le numéro de suivi, puis les données personnelles du client sont supprimées définitivement.",
     "deliveryStatus": "Statut du colis",
-    "refreshTracking": "Actualiser le statut"
+    "refreshTracking": "Actualiser le statut",
+    "whatsappAsk": "Demander sur WhatsApp : confirmez-vous ?",
+    "approved": "Commande confirmée.",
+    "sendTracking": "Envoyer le suivi au client sur WhatsApp",
+    "sendTrackingHint": "Les données du client viennent d'être effacées : c'est la seule occasion de lui envoyer le message de suivi (déjà rédigé, il ne reste qu'à envoyer).",
+    "doneWithoutSending": "Terminé, fermer sans envoyer",
+    "openAtCarrier": "Ouvrir le colis chez le transporteur"
   },
   "notifications": {
     "title": "Notifications",
@@ -452,7 +458,12 @@
     "noKeys": "Les clés de cette société ne sont pas encore ajoutées au serveur",
     "save": "Enregistrer",
     "saved": "Enregistré",
-    "error": "Échec de l'enregistrement."
+    "error": "Échec de l'enregistrement.",
+    "trackingTitle": "Lien de suivi chez le transporteur",
+    "trackingHint": "Ouvrez le site de suivi de votre transporteur, copiez l'adresse de la page de suivi et remplacez le numéro du colis par '{tracking}'. Exemple : https://site-transporteur/track?code='{tracking}'. Le client le verra sur sa page de commande, vous sur la page commande.",
+    "manualLink": "Lien général (suivi manuel ou transporteur sans lien propre)",
+    "saveLinks": "Enregistrer les liens",
+    "linkInvalid": "Le lien doit commencer par https:// et contenir '{tracking}'."
   },
   "homeSections": {
     "show": "Afficher cette section dans la boutique",
@@ -535,7 +546,18 @@
     "siteTitle": "Titre de la boutique sur Google",
     "siteTitleHint": "Affiché dans les résultats de recherche et l'onglet du navigateur pour la page d'accueil. Laissez vide pour le titre par défaut.",
     "siteDescription": "Description de la boutique sur Google",
-    "siteDescriptionHint": "Une ou deux phrases sous le titre dans les résultats de recherche et lors du partage du lien (environ 160 caractères)."
+    "siteDescriptionHint": "Une ou deux phrases sous le titre dans les résultats de recherche et lors du partage du lien (environ 160 caractères).",
+    "wa": {
+      "title": "Messages WhatsApp",
+      "hint": "Les textes envoyés au client et à la boutique par WhatsApp. Ils sont prêts à l'emploi (il suffit d'appuyer sur « envoyer ») et choisis selon la langue du client.",
+      "ask": "1) Vous demandez au client : confirmez-vous ?",
+      "askHint": "Bouton « Demander sur WhatsApp » de la page commande.",
+      "confirm": "2) Le client confirme (bouton sur sa page)",
+      "confirmHint": "Affiché au client après sa commande; ouvre le WhatsApp de la boutique avec ce texte. Le numéro WhatsApp de la boutique doit être renseigné plus haut.",
+      "tracking": "3) Vous envoyez le suivi après confirmation",
+      "trackingHint": "Proposé une seule fois après la confirmation de la commande.",
+      "placeholders": "Utilisables : '{name}' nom du client, '{number}' numéro de commande, '{total}' montant, '{tracking}' numéro de suivi, '{link}' lien de suivi. Laissez vide pour revenir au texte par défaut."
+    }
   },
   "womenPage": {
     "title": "Page Femme",

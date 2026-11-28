@@ -6,7 +6,7 @@ import { useActionState, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-export type FormState = { ok?: boolean; error?: string; at?: number };
+export type FormState = { ok?: boolean; error?: string; at?: number; /** wa.me link the page should offer once (e.g. the tracking message after confirming an order). */ whatsappUrl?: string };
 
 /** A slide-up sheet with a form; closes itself when the server action succeeds. */
 export function FormSheet({

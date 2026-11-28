@@ -23,6 +23,20 @@ export async function savePageAction(slug: string, _prev: FormState, form: FormD
   return { ok: true, at: Date.now() };
 }
 
+export async function saveWhatsappMessagesAction(_prev: FormState, form: FormData): Promise<FormState> {
+  const token = await requireSession();
+  const t = await getTranslations("pagesAdmin");
+  const text = (k: string, l: string) => String(form.get(`${k}_${l}`) ?? "").trim();
+  const group = (k: string) => ({ ar: text(k, "ar"), fr: text(k, "fr"), en: text(k, "en") });
+  try {
+    await api.saveWhatsappMessages(token, { ask: group("ask"), confirm: group("confirm"), tracking: group("tracking") });
+  } catch {
+    return { error: t("errors.generic") };
+  }
+  revalidatePath("/pages");
+  return { ok: true, at: Date.now() };
+}
+
 export async function saveStoreInfoAction(_prev: FormState, form: FormData): Promise<FormState> {
   const token = await requireSession();
   const t = await getTranslations("pagesAdmin");

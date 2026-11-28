@@ -6421,7 +6421,7 @@ export interface paths {
                 };
             };
         };
-        /** Choose the delivery company. New confirmations use it at once; parcels already sent stay with their company. */
+        /** Choose the delivery company and/or save the companies' tracking page links. New confirmations use the company at once; parcels already sent stay with their company. */
         put: {
             parameters: {
                 query?: never;
@@ -6432,7 +6432,10 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        provider: string;
+                        provider?: string;
+                        trackingUrls?: {
+                            [key: string]: "" | string;
+                        };
                     };
                 };
             };
@@ -7887,6 +7890,138 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/whatsapp-messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The three WhatsApp message texts (defaults filled in) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WhatsappMessages"];
+                    };
+                };
+                /** @description Missing or invalid token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Invalid input */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /** Save the WhatsApp message texts */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["WhatsappMessages"];
+                };
+            };
+            responses: {
+                /** @description Saved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WhatsappMessages"];
+                    };
+                };
+                /** @description Missing or invalid token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Invalid input */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8185,6 +8320,9 @@ export interface components {
             discountTotal: number;
             total: number;
             trackingNumber: string | null;
+            deliveryStatus: string | null;
+            carrierTrackingUrl: string | null;
+            whatsappConfirmUrl: string | null;
             createdAt: string;
             items: {
                 name: string;
@@ -8412,6 +8550,7 @@ export interface components {
             discountCode: string | null;
             deliveryCompany: string | null;
             deliveryStatus: string | null;
+            carrierTrackingUrl: string | null;
             confirmedAt: string | null;
             items: {
                 /** Format: uuid */
@@ -8430,8 +8569,11 @@ export interface components {
                 daira: string | null;
                 address: string;
                 whatsappUrl: string;
+                whatsappAskUrl: string;
                 telUrl: string;
             } | null;
+            /** @description Only in the answer to 'confirm': a WhatsApp link with the tracking number and page already typed for the customer (his phone is erased right after, so this is the only chance) */
+            whatsappTrackingUrl: string | null;
         };
         AdminOverview: {
             newOrdersToday: number;
@@ -8797,6 +8939,9 @@ export interface components {
         };
         AdminDelivery: {
             provider: string;
+            trackingUrls: {
+                [key: string]: string;
+            };
             providers: {
                 id: string;
                 name: string;
@@ -8890,6 +9035,24 @@ export interface components {
             hours: components["schemas"]["OptionalI18n"];
             siteTitle?: components["schemas"]["OptionalI18n"];
             siteDescription?: components["schemas"]["OptionalI18n"];
+        };
+        /** @description Placeholders: {name} {number} {total} {tracking} {link} {carrierLink}. An empty text brings back the default one. */
+        WhatsappMessages: {
+            ask: {
+                ar: string;
+                fr: string;
+                en: string;
+            };
+            confirm: {
+                ar: string;
+                fr: string;
+                en: string;
+            };
+            tracking: {
+                ar: string;
+                fr: string;
+                en: string;
+            };
         };
     };
     responses: never;

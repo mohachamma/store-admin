@@ -9,6 +9,7 @@ import { requireSession } from "@/lib/auth";
 import { savePageAction } from "./actions";
 import { PageForm } from "./PageForm";
 import { StoreInfoForm } from "./StoreInfoForm";
+import { WhatsappMessagesForm } from "./WhatsappMessagesForm";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("pagesAdmin"))("title") };
@@ -16,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PagesAdminPage() {
   const token = await requireSession();
-  const [t, locale, pages, info] = await Promise.all([getTranslations("pagesAdmin"), getLocale() as Promise<"ar" | "fr">, api.listPages(token), api.getStoreInfo(token)]);
+  const [t, locale, pages, info, waMessages] = await Promise.all([getTranslations("pagesAdmin"), getLocale() as Promise<"ar" | "fr">, api.listPages(token), api.getStoreInfo(token), api.getWhatsappMessages(token)]);
   return (
     <div className="space-y-8">
       <div>
@@ -60,6 +61,18 @@ export default async function PagesAdminPage() {
         <Card className="max-w-2xl">
           <CardContent>
             <StoreInfoForm value={info} />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl font-medium">{t("wa.title")}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t("wa.hint")}</p>
+        </div>
+        <Card className="max-w-2xl">
+          <CardContent>
+            <WhatsappMessagesForm value={waMessages} />
           </CardContent>
         </Card>
       </section>

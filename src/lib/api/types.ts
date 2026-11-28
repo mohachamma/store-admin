@@ -54,6 +54,7 @@ export type HomeCardInput = S["HomeCardInput"];
 export type AdminNewsletter = S["AdminNewsletter"];
 export type NewsletterSubscribers = S["NewsletterSubscribers"];
 export type SlideInput = S["SlideInput"];
+export type WhatsappMessages = S["WhatsappMessages"];
 export type ProfitReport = S["ProfitReport"];
 export type Expense = S["Expense"];
 export type ExpenseInput = S["ExpenseInput"];
@@ -143,6 +144,7 @@ export interface AdminApi {
   saveProfitSettings(token: string, input: ProfitSettings): Promise<void>;
   getDelivery(token: string): Promise<AdminDelivery>;
   setDelivery(token: string, provider: string): Promise<AdminDelivery>;
+  setTrackingUrls(token: string, urls: Record<string, string>): Promise<AdminDelivery>;
   refreshTracking(token: string, id: string): Promise<string>;
   listDiscountCodes(token: string): Promise<AdminDiscountCode[]>;
   saveDiscountCode(token: string, id: string | null, input: DiscountCodeInput): Promise<AdminDiscountCode>;
@@ -154,6 +156,8 @@ export interface AdminApi {
 
   listPages(token: string): Promise<AdminInfoPage[]>;
   savePage(token: string, slug: string, input: InfoPageInput): Promise<AdminInfoPage>;
+  getWhatsappMessages(token: string): Promise<WhatsappMessages>;
+  saveWhatsappMessages(token: string, input: WhatsappMessages): Promise<void>;
   getStoreInfo(token: string): Promise<AdminStoreInfo>;
   saveStoreInfo(token: string, input: AdminStoreInfo): Promise<void>;
   getWhyUs(token: string): Promise<AdminWhyUs>;
