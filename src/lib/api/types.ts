@@ -54,6 +54,7 @@ export type HomeCardInput = S["HomeCardInput"];
 export type AdminNewsletter = S["AdminNewsletter"];
 export type NewsletterSubscribers = S["NewsletterSubscribers"];
 export type SlideInput = S["SlideInput"];
+export type WhatsappMessages = S["WhatsappMessages"];
 export type ProfitReport = S["ProfitReport"];
 export type Expense = S["Expense"];
 export type ExpenseInput = S["ExpenseInput"];
@@ -154,6 +155,8 @@ export interface AdminApi {
 
   listPages(token: string): Promise<AdminInfoPage[]>;
   savePage(token: string, slug: string, input: InfoPageInput): Promise<AdminInfoPage>;
+  getWhatsappMessages(token: string): Promise<WhatsappMessages>;
+  saveWhatsappMessages(token: string, input: WhatsappMessages): Promise<void>;
   getStoreInfo(token: string): Promise<AdminStoreInfo>;
   saveStoreInfo(token: string, input: AdminStoreInfo): Promise<void>;
   getWhyUs(token: string): Promise<AdminWhyUs>;

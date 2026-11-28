@@ -110,7 +110,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                   </dl>
                   <div className="flex flex-wrap gap-2 print:hidden">
                     <a href={o.customer.telUrl} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}><Phone /> {t("call")}</a>
-                    <a href={o.customer.whatsappUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ size: "sm" }), "bg-[#128c4a] hover:bg-[#128c4a]/90")}><MessageCircle /> {t("whatsapp")}</a>
+                    <a href={o.customer.whatsappAskUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ size: "sm" }), "bg-[#128c4a] text-white hover:bg-[#128c4a]/90")}><MessageCircle /> {t("whatsappAsk")}</a>
                   </div>
                   <p className="text-xs text-muted-foreground">{t("pendingHint")}</p>
                 </>

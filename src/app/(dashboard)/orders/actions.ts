@@ -20,12 +20,15 @@ export async function confirmOrderAction(id: string, _prev: FormState, form: For
   const tracking = String(form.get("trackingNumber") ?? "").trim();
   if (!auto && !tracking) return { error: (await getTranslations("orders.errors"))("trackingRequired") };
   try {
-    await api.confirmOrder(token, id, auto ? { company: "auto" } : { company: String(form.get("company") ?? "").trim() || "manual", trackingNumber: tracking }, await getLocale());
+    const done = await api.confirmOrder(token, id, auto ? { company: "auto" } : { company: String(form.get("company") ?? "").trim() || "manual", trackingNumber: tracking }, await getLocale());
+    // The customer's phone is erased now: offer the tracking message once. No revalidation here, or the page would re-render
+    // (the order is no longer pending) and the message would disappear; the form refreshes the page when the owner is done with it.
+    if (done.whatsappTrackingUrl) return { ok: true, at: Date.now(), whatsappUrl: done.whatsappTrackingUrl };
   } catch (e) {
     return fail(e);
   }
-  revalidatePath(`/orders/${id}`);
   revalidatePath("/orders");
+  revalidatePath(`/orders/${id}`);
   return { ok: true, at: Date.now() };
 }
 

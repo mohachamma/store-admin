@@ -1,4 +1,4 @@
-import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, Expense, ProfitSettings, ProfitReport, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
+import type { AdminApi, AdminBrand, AdminCategory, AdminCollection, AdminDiscountCode, AdminOffer, AdminSlide, AdminWhyUs, AdminWomenPage, AdminMenPage, AdminInfoPage, AdminStoreInfo, AdminHomeCard, AdminNewsletter, AdminWilaya, AdminOrderDetail, Expense, ProfitSettings, ProfitReport, WhatsappMessages, AdminOrderRow, AdminProduct, BrandsStripSettings, OrderStatus, Overview, SalePageSettings, SiteContent } from "./types";
 
 /** Demo credentials for mock mode only (never valid against the real API). */
 export const MOCK_CREDENTIALS = { email: "admin@store.test", password: "admin1234" } as const;
@@ -48,6 +48,7 @@ interface MockDb {
   subscribers: { id: string; email: string; createdAt: string }[];
   expenses: Expense[];
   profitSettings: ProfitSettings;
+  whatsapp: WhatsappMessages;
 }
 /** An order as the dashboard shows it, with the customer's contact details kept only while it is pending (like the real API). */
 type MockOrder = AdminOrderRow & {
@@ -91,6 +92,11 @@ const db = (): MockDb =>
       { id: "ex_3", spentOn: new Date().toISOString().slice(0, 10), category: "packaging" as const, platform: null, amount: 4_200, note: "Bags" },
     ],
     profitSettings: { returnFee: 200, returnedItemsLost: false, cardFeePercent: 0 },
+    whatsapp: {
+      ask: { ar: "مرحباً {name} 👋\nاستلمنا طلبك رقم #{number} بقيمة {total}.\nهل تؤكد الطلب؟ أجبنا بـ «نعم» ليتم شحنه إليك.", fr: "Bonjour {name}, confirmez-vous la commande n°{number} ({total}) ?", en: "Hello {name}, do you confirm order #{number} ({total})?" },
+      confirm: { ar: "مرحباً، أؤكد طلبي رقم #{number} ✅", fr: "Bonjour, je confirme ma commande n°{number} ✅", en: "Hello, I confirm my order #{number} ✅" },
+      tracking: { ar: "تم تأكيد طلبك رقم #{number} ✅\nرقم التتبع: {tracking}\nتابع طلبك: {link}", fr: "Commande n°{number} confirmée ✅ Suivi : {tracking} {link}", en: "Order #{number} confirmed ✅ Tracking: {tracking} {link}" },
+    },
     freeShippingOver: 10000,
     codes: [{ id: "dc_welcome", code: "WELCOME10", kind: "percent" as const, value: 10, minSubtotal: 3000, maxUses: null, usedCount: 4, startsAt: null, endsAt: null, isActive: true }],
     menPage: { enabled: true, title: { ar: "رجال", fr: "Homme", en: "Men" }, subtitle: { ar: "أحدث ملابس الرجال", fr: "", en: "" }, heroUrl: null },
@@ -192,7 +198,8 @@ const rowOf = (o: MockOrder): AdminOrderRow => ({
 const detailOf = (o: MockOrder): AdminOrderDetail => ({
   ...rowOf(o), subtotal: o.subtotal, shippingFee: o.shippingFee, discountTotal: o.discountTotal, discountCode: o.discountCode, deliveryCompany: o.deliveryCompany,
   deliveryStatus: o.deliveryStatus, confirmedAt: o.confirmedAt, items: o.items,
-  customer: o.contact ? { ...o.contact, whatsappUrl: `https://wa.me/213${o.contact.phone.slice(1)}`, telUrl: `tel:${o.contact.phone}` } : null,
+  customer: o.contact ? { ...o.contact, whatsappUrl: `https://wa.me/213${o.contact.phone.slice(1)}`, whatsappAskUrl: `https://wa.me/213${o.contact.phone.slice(1)}?text=${encodeURIComponent(`مرحباً ${o.contact.name}، هل تؤكد طلبك رقم #${o.orderNumber}؟`)}`, telUrl: `tel:${o.contact.phone}` } : null,
+  whatsappTrackingUrl: null,
 });
 
 export const mockApi: AdminApi = {
@@ -210,8 +217,9 @@ export const mockApi: AdminApi = {
     if (o.status !== "pending") throw Object.assign(new Error("not pending"), { status: 409 });
     const auto = db().deliveryProvider !== "manual" && !input.trackingNumber;
     if (!auto && !input.trackingNumber) throw Object.assign(new Error("tracking required"), { status: 422 });
+    const phone = o.contact?.phone;
     Object.assign(o, { status: "confirmed", deliveryCompany: auto ? db().deliveryProvider : input.company, trackingNumber: auto ? `YAL-MOCK-${o.orderNumber}` : input.trackingNumber, deliveryStatus: "created", confirmedAt: new Date().toISOString(), contact: null, customerName: null, customerPhone: null });
-    return detailOf(o);
+    return { ...detailOf(o), whatsappTrackingUrl: phone ? `https://wa.me/213${phone.slice(1)}?text=${encodeURIComponent(`تم تأكيد طلبك رقم #${o.orderNumber} ✅ رقم التتبع: ${o.trackingNumber}`)}` : null };
   },
   async setOrderStatus(_t, id, status) {
     const o = orderById(id);
@@ -467,6 +475,12 @@ export const mockApi: AdminApi = {
     const page = db().pages.find((p) => p.slug === slug);
     if (!page) throw fail(404, "Page not found");
     return Object.assign(page, { ...input, updatedAt: new Date().toISOString() });
+  },
+  async getWhatsappMessages() {
+    return db().whatsapp;
+  },
+  async saveWhatsappMessages(_t, input) {
+    db().whatsapp = input;
   },
   async getStoreInfo() {
     return db().storeInfo;
