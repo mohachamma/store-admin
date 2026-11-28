@@ -26,6 +26,7 @@ interface Row {
   stock: string;
   price: string;
   compare: string;
+  cost: string;
 }
 
 const MAX_IMAGES = 10;
@@ -35,7 +36,7 @@ const cell = "h-10 rounded-lg px-2.5 text-center";
 
 let seq = 0;
 const newKey = () => `r${++seq}`;
-const toRow = (v: AdminProduct["variants"][number]): Row => ({ key: newKey(), id: v.id, size: v.size, color: v.color, colorHex: v.colorHex ?? "", sku: v.sku ?? "", stock: String(v.stock), price: String(v.price), compare: v.compareAtPrice ? String(v.compareAtPrice) : "" });
+const toRow = (v: AdminProduct["variants"][number]): Row => ({ key: newKey(), id: v.id, size: v.size, color: v.color, colorHex: v.colorHex ?? "", sku: v.sku ?? "", stock: String(v.stock), price: String(v.price), compare: v.compareAtPrice ? String(v.compareAtPrice) : "", cost: v.costPrice === null || v.costPrice === undefined ? "" : String(v.costPrice) });
 
 export function ProductForm({ product, categories, brands }: { product?: AdminProduct; categories: AdminCategory[]; brands: AdminBrand[] }) {
   const t = useTranslations("products");
@@ -57,7 +58,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
     setRows((rs) => {
       const have = new Set(rs.map((r) => `${r.size.toLowerCase()}|${r.color.toLowerCase()}`));
       const template = rs[0];
-      const added = sizes.filter((s) => !have.has(`${s.toLowerCase()}|${(template?.color ?? "").toLowerCase()}`)).map((size): Row => ({ key: newKey(), size, color: template?.color ?? "", colorHex: template?.colorHex ?? "", sku: "", stock: "0", price: template?.price ?? "", compare: template?.compare ?? "" }));
+      const added = sizes.filter((s) => !have.has(`${s.toLowerCase()}|${(template?.color ?? "").toLowerCase()}`)).map((size): Row => ({ key: newKey(), size, color: template?.color ?? "", colorHex: template?.colorHex ?? "", sku: "", stock: "0", price: template?.price ?? "", compare: template?.compare ?? "", cost: template?.cost ?? "" }));
       return [...rs, ...added];
     });
 
@@ -112,7 +113,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
       const k = `${r.size.trim().toLowerCase()}|${r.color.trim().toLowerCase()}`;
       if (seen.has(k)) return setError(t("errors.duplicate"));
       seen.add(k);
-      variants.push({ id: r.id, size: r.size.trim(), color: r.color.trim(), colorHex: r.colorHex || null, sku: r.sku.trim() || null, stock: Math.max(0, Math.floor(Number(r.stock) || 0)), price, compareAtPrice: compare });
+      variants.push({ id: r.id, size: r.size.trim(), color: r.color.trim(), colorHex: r.colorHex || null, sku: r.sku.trim() || null, stock: Math.max(0, Math.floor(Number(r.stock) || 0)), price, compareAtPrice: compare, costPrice: r.cost.trim() ? Number(r.cost) : null });
     }
     if (isPublished && variants.length === 0) return setError(t("errors.needVariant"));
     if (isPublished && images.length === 0) return setError(t("errors.needImage"));
@@ -213,7 +214,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
       <Card>
         <CardHeader>
           <CardTitle>{t("variantsTitle")}</CardTitle>
-          <Button type="button" variant="outline" size="sm" onClick={() => setRows((rs) => [...rs, { key: newKey(), size: "", color: rs[0]?.color ?? "", colorHex: rs[0]?.colorHex ?? "", sku: "", stock: "0", price: rs[0]?.price ?? "", compare: rs[0]?.compare ?? "" }])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => setRows((rs) => [...rs, { key: newKey(), size: "", color: rs[0]?.color ?? "", colorHex: rs[0]?.colorHex ?? "", sku: "", stock: "0", price: rs[0]?.price ?? "", compare: rs[0]?.compare ?? "", cost: rs[0]?.cost ?? "" }])}>
             <Plus /> {t("addVariant")}
           </Button>
         </CardHeader>
@@ -230,11 +231,11 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
             <p className="rounded-xl bg-secondary px-4 py-6 text-center text-xs text-muted-foreground">{t("noVariantsHint")}</p>
           ) : (
             <div className="space-y-2">
-              <div className="hidden grid-cols-[1fr_1fr_1.2fr_.8fr_1fr_1fr_2rem] gap-2 px-1 text-[10px] font-semibold text-muted-foreground md:grid">
-                <span>{t("size")}</span><span>{t("color")}</span><span>{t("sku")}</span><span>{t("stockLabel")}</span><span>{t("price")}</span><span>{t("compare")}</span><span />
+              <div className="hidden grid-cols-[1fr_1fr_1.2fr_.8fr_1fr_1fr_1fr_2rem] gap-2 px-1 text-[10px] font-semibold text-muted-foreground md:grid">
+                <span>{t("size")}</span><span>{t("color")}</span><span>{t("sku")}</span><span>{t("stockLabel")}</span><span>{t("price")}</span><span>{t("compare")}</span><span>{t("cost")}</span><span />
               </div>
               {rows.map((r) => (
-                <div key={r.key} className="grid grid-cols-3 gap-2 rounded-2xl border border-border p-2 md:grid-cols-[1fr_1fr_1.2fr_.8fr_1fr_1fr_2rem] md:border-0 md:p-0">
+                <div key={r.key} className="grid grid-cols-3 gap-2 rounded-2xl border border-border p-2 md:grid-cols-[1fr_1fr_1.2fr_.8fr_1fr_1fr_1fr_2rem] md:border-0 md:p-0">
                   <Field label={t("size")}><Input className={cell} dir="ltr" value={r.size} maxLength={10} onChange={(e) => setRow(r.key, { size: e.target.value })} /></Field>
                   <Field label={t("color")}>
                     <div className="flex items-center gap-1.5">
@@ -264,6 +265,7 @@ export function ProductForm({ product, categories, brands }: { product?: AdminPr
                   <Field label={t("stockLabel")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.stock} onChange={(e) => setRow(r.key, { stock: e.target.value.replace(/\D/g, "") })} /></Field>
                   <Field label={t("price")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.price} onChange={(e) => setRow(r.key, { price: e.target.value.replace(/\D/g, "") })} /></Field>
                   <Field label={t("compare")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.compare} onChange={(e) => setRow(r.key, { compare: e.target.value.replace(/\D/g, "") })} /></Field>
+                  <Field label={t("cost")}><Input className={cell} dir="ltr" inputMode="numeric" value={r.cost} onChange={(e) => setRow(r.key, { cost: e.target.value.replace(/\D/g, "") })} /></Field>
                   <button type="button" onClick={() => setRows((rs) => rs.filter((x) => x.key !== r.key))} aria-label={t("removeVariant")} title={t("removeVariant")} className="grid h-10 place-items-center rounded-full text-destructive hover:bg-destructive/10">
                     <Trash2 className="size-4" />
                   </button>

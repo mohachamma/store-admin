@@ -18,6 +18,15 @@ async function call<R>(path: string, init: RequestInit & { token?: string } = {}
   return (await res.json()) as R;
 }
 
+const rangeQuery = (r: { from?: string; to?: string }, locale?: string) => {
+  const q = new URLSearchParams();
+  if (locale) q.set("locale", locale);
+  if (r.from) q.set("from", r.from);
+  if (r.to) q.set("to", r.to);
+  const s = q.toString();
+  return s ? `?${s}` : "";
+};
+
 export const realApi: AdminApi = {
   async login(email, password) {
     try {
@@ -88,6 +97,12 @@ export const realApi: AdminApi = {
   setDelivery: (token, provider) => call("/admin/delivery", { token, method: "PUT", body: JSON.stringify({ provider }) }),
   refreshTracking: async (token, id) => (await call<{ deliveryStatus: string }>(`/admin/orders/${id}/refresh-tracking`, { token, method: "POST" })).deliveryStatus,
   setFreeShipping: async (token, over) => void (await call("/admin/shipping/rules", { token, method: "PUT", body: JSON.stringify({ freeShippingOver: over }) })),
+  getProfit: (token, r, locale) => call(`/admin/profit${rangeQuery(r, locale)}`, { token }),
+  listExpenses: (token, r) => call(`/admin/expenses${rangeQuery(r)}`, { token }),
+  saveExpense: (token, id, input) => call(id ? `/admin/expenses/${id}` : "/admin/expenses", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
+  deleteExpense: async (token, id) => void (await call(`/admin/expenses/${id}`, { token, method: "DELETE" })),
+  getProfitSettings: (token) => call("/admin/profit-settings", { token }),
+  saveProfitSettings: async (token, input) => void (await call("/admin/profit-settings", { token, method: "PUT", body: JSON.stringify(input) })),
   listDiscountCodes: (token) => call("/admin/discount-codes", { token }),
   saveDiscountCode: (token, id, input) => call(id ? `/admin/discount-codes/${id}` : "/admin/discount-codes", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
   deleteDiscountCode: async (token, id) => void (await call(`/admin/discount-codes/${id}`, { token, method: "DELETE" })),

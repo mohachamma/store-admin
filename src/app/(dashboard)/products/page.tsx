@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import type { Locale } from "@/i18n/config";
 import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
+import { colorName } from "@/lib/color-name";
 import { formatDZD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { AudienceSelect } from "./AudienceSelect";
@@ -26,7 +27,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const page = Math.max(1, Number(sp.page) || 1);
   const token = await requireSession();
   const locale = (await getLocale()) as Locale;
-  const [t, list] = await Promise.all([getTranslations("products"), api.listProducts(token, { q, status, limit: PAGE, offset: (page - 1) * PAGE }, locale)]);
+  const [t, tcolors, list] = await Promise.all([getTranslations("products"), getTranslations("colors"), api.listProducts(token, { q, status, limit: PAGE, offset: (page - 1) * PAGE }, locale)]);
   const href = (over: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
     for (const [k, v] of Object.entries({ q, status, ...over })) if (v) p.set(k, v);
@@ -88,6 +89,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                   {p.compareAtPrice ? <s className="ms-2 text-xs font-normal text-muted-foreground">{formatDZD(p.compareAtPrice, locale)}</s> : null}
                 </p>
                 <p className="text-[11px] text-muted-foreground">{t("variants", { n: p.variantCount })} · {t("stock", { n: p.totalStock })}</p>
+                {p.soldOut.length ? (
+                  <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-destructive">
+                    <span className="font-semibold">{t("soldOutSizes")}</span>
+                    {Object.entries(Object.groupBy(p.soldOut, (x) => x.color)).map(([color, items]) => (
+                      <span key={color} className="rounded-full bg-destructive/10 px-2 py-0.5" dir="auto">
+                        {color ? `${colorName(tcolors, color)}: ` : ""}{items!.map((i) => i.size).join("، ")}
+                      </span>
+                    ))}
+                  </p>
+                ) : null}
               </Link>
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <AudienceSelect id={p.id} value={p.audience} />

@@ -10,7 +10,7 @@ import type { AdminWilaya, WilayaUpdate } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { saveWilayasAction } from "./actions";
 
-type Edit = { home?: string; desk?: string; active?: boolean };
+type Edit = { home?: string; desk?: string; homeCost?: string; deskCost?: string; active?: boolean };
 const digits = (s: string) => s.replace(/\D/g, "");
 const cell = "h-9 w-full rounded-lg px-2 text-center";
 
@@ -24,11 +24,13 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
   const [q, setQ] = useState("");
   const [bulkHome, setBulkHome] = useState("");
   const [bulkDesk, setBulkDesk] = useState("");
+  const [bulkHomeCost, setBulkHomeCost] = useState("");
+  const [bulkDeskCost, setBulkDeskCost] = useState("");
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const name = (w: AdminWilaya) => (locale === "fr" ? w.nameFr : w.nameAr);
   const visible = wilayas.filter((w) => !q.trim() || `${w.code} ${w.nameAr} ${w.nameFr}`.toLowerCase().includes(q.trim().toLowerCase()));
-  const val = (w: AdminWilaya) => ({ home: edits[w.code]?.home ?? String(w.homeFee), desk: edits[w.code]?.desk ?? String(w.deskFee), active: edits[w.code]?.active ?? w.active });
+  const val = (w: AdminWilaya) => ({ home: edits[w.code]?.home ?? String(w.homeFee), desk: edits[w.code]?.desk ?? String(w.deskFee), homeCost: edits[w.code]?.homeCost ?? String(w.homeCost), deskCost: edits[w.code]?.deskCost ?? String(w.deskCost), active: edits[w.code]?.active ?? w.active });
   const set = (code: number, patch: Edit) => setEdits((e) => ({ ...e, [code]: { ...e[code], ...patch } }));
 
   const changes: WilayaUpdate[] = wilayas.flatMap((w) => {
@@ -36,6 +38,8 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
     const u: WilayaUpdate = { code: w.code };
     if (v.home !== "" && Number(v.home) !== w.homeFee) u.homeFee = Number(v.home);
     if (v.desk !== "" && Number(v.desk) !== w.deskFee) u.deskFee = Number(v.desk);
+    if (v.homeCost !== "" && Number(v.homeCost) !== w.homeCost) u.homeCost = Number(v.homeCost);
+    if (v.deskCost !== "" && Number(v.deskCost) !== w.deskCost) u.deskCost = Number(v.deskCost);
     if (v.active !== w.active) u.active = v.active;
     return Object.keys(u).length > 1 ? [u] : [];
   });
@@ -43,7 +47,7 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
   function applyBulk() {
     setEdits((e) => {
       const next = { ...e };
-      for (const w of visible) next[w.code] = { ...next[w.code], ...(bulkHome !== "" && { home: bulkHome }), ...(bulkDesk !== "" && { desk: bulkDesk }) };
+      for (const w of visible) next[w.code] = { ...next[w.code], ...(bulkHome !== "" && { home: bulkHome }), ...(bulkDesk !== "" && { desk: bulkDesk }), ...(bulkHomeCost !== "" && { homeCost: bulkHomeCost }), ...(bulkDeskCost !== "" && { deskCost: bulkDeskCost }) };
       return next;
     });
   }
@@ -76,26 +80,30 @@ export function ShippingTable({ wilayas }: { wilayas: AdminWilaya[] }) {
         </div>
         <Input aria-label={t("home")} placeholder={t("home")} inputMode="numeric" dir="ltr" value={bulkHome} onChange={(e) => setBulkHome(digits(e.target.value))} className="h-10 w-28 bg-background text-center" />
         <Input aria-label={t("desk")} placeholder={t("desk")} inputMode="numeric" dir="ltr" value={bulkDesk} onChange={(e) => setBulkDesk(digits(e.target.value))} className="h-10 w-28 bg-background text-center" />
-        <Button type="button" variant="outline" size="sm" onClick={applyBulk} disabled={!bulkHome && !bulkDesk}>{t("apply")} ({visible.length})</Button>
+        <Input aria-label={t("homeCost")} placeholder={t("homeCost")} title={t("costHint")} inputMode="numeric" dir="ltr" value={bulkHomeCost} onChange={(e) => setBulkHomeCost(digits(e.target.value))} className="h-10 w-28 bg-background text-center" />
+        <Input aria-label={t("deskCost")} placeholder={t("deskCost")} title={t("costHint")} inputMode="numeric" dir="ltr" value={bulkDeskCost} onChange={(e) => setBulkDeskCost(digits(e.target.value))} className="h-10 w-28 bg-background text-center" />
+        <Button type="button" variant="outline" size="sm" onClick={applyBulk} disabled={!bulkHome && !bulkDesk && !bulkHomeCost && !bulkDeskCost}>{t("apply")} ({visible.length})</Button>
       </div>
 
-      <div className="hidden grid-cols-[3rem_1fr_7rem_7rem_4.5rem] gap-3 px-3 text-[10px] font-semibold text-muted-foreground md:grid">
-        <span>#</span><span>{t("wilaya")}</span><span className="text-center">{t("home")}</span><span className="text-center">{t("desk")}</span><span className="text-center">{t("active")}</span>
+      <div className="hidden grid-cols-[3rem_1fr_6rem_6rem_6rem_6rem_4.5rem] gap-3 px-3 text-[10px] font-semibold text-muted-foreground md:grid">
+        <span>#</span><span>{t("wilaya")}</span><span className="text-center">{t("home")}</span><span className="text-center">{t("desk")}</span><span className="text-center" title={t("costHint")}>{t("homeCost")}</span><span className="text-center" title={t("costHint")}>{t("deskCost")}</span><span className="text-center">{t("active")}</span>
       </div>
       <ul className="divide-y divide-border rounded-[var(--radius-card)] border border-border">
         {visible.map((w) => {
           const v = val(w);
           return (
-            <li key={w.code} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[3rem_1fr_7rem_7rem_4.5rem]", edits[w.code] && "bg-primary/10", !v.active && "opacity-60")}>
+            <li key={w.code} className={cn("grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 p-3 md:grid-cols-[3rem_1fr_6rem_6rem_6rem_6rem_4.5rem]", edits[w.code] && "bg-primary/10", !v.active && "opacity-60")}>
               <span className="hidden text-xs tabular-nums text-muted-foreground md:block" dir="ltr">{String(w.code).padStart(2, "0")}</span>
               <span className="text-sm font-medium"><span className="text-xs text-muted-foreground md:hidden" dir="ltr">{String(w.code).padStart(2, "0")} · </span>{name(w)}</span>
               <label className="flex items-center justify-end gap-2 text-xs md:order-last md:justify-center">
                 <input type="checkbox" checked={v.active} onChange={(e) => set(w.code, { active: e.target.checked })} className="size-4 accent-ink" aria-label={t("active")} />
                 <span className="md:hidden">{t("active")}</span>
               </label>
-              <div className="col-span-2 grid grid-cols-2 gap-2 md:col-span-2 md:grid-cols-2">
+              <div className="col-span-2 grid grid-cols-2 gap-2 md:col-span-4 md:grid-cols-4">
                 <Input aria-label={t("home")} className={cell} dir="ltr" inputMode="numeric" value={v.home} onChange={(e) => set(w.code, { home: digits(e.target.value) })} />
                 <Input aria-label={t("desk")} className={cell} dir="ltr" inputMode="numeric" value={v.desk} onChange={(e) => set(w.code, { desk: digits(e.target.value) })} />
+                <Input aria-label={t("homeCost")} className={cell} dir="ltr" inputMode="numeric" value={v.homeCost} onChange={(e) => set(w.code, { homeCost: digits(e.target.value) })} />
+                <Input aria-label={t("deskCost")} className={cell} dir="ltr" inputMode="numeric" value={v.deskCost} onChange={(e) => set(w.code, { deskCost: digits(e.target.value) })} />
               </div>
             </li>
           );
