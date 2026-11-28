@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, ExternalLink, MessageCircle, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,6 +85,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               <CardContent className="space-y-1 text-sm">
                 <p><span className="text-muted-foreground">{t("company")}:</span> {o.deliveryCompany}</p>
                 <p><span className="text-muted-foreground">{t("tracking")}:</span> <strong dir="ltr">{o.trackingNumber}</strong></p>
+                {o.carrierTrackingUrl ? (
+                  <p className="print:hidden"><a href={o.carrierTrackingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold underline"><ExternalLink className="size-3.5" /> {t("openAtCarrier")}</a></p>
+                ) : null}
                 {o.deliveryStatus ? <p><span className="text-muted-foreground">{t("deliveryStatus")}:</span> <span dir="ltr">{o.deliveryStatus}</span></p> : null}
                 {o.deliveryCompany && o.deliveryCompany !== "manual" && ["confirmed", "shipped"].includes(o.status) ? (
                   <form action={refreshTrackingAction.bind(null, o.id)} className="pt-1 print:hidden">

@@ -233,7 +233,8 @@
     "approved": "Commande confirmée.",
     "sendTracking": "Envoyer le suivi au client sur WhatsApp",
     "sendTrackingHint": "Les données du client viennent d'être effacées : c'est la seule occasion de lui envoyer le message de suivi (déjà rédigé, il ne reste qu'à envoyer).",
-    "doneWithoutSending": "Terminé, fermer sans envoyer"
+    "doneWithoutSending": "Terminé, fermer sans envoyer",
+    "openAtCarrier": "Ouvrir le colis chez le transporteur"
   },
   "notifications": {
     "title": "Notifications",
@@ -457,7 +458,12 @@
     "noKeys": "Les clés de cette société ne sont pas encore ajoutées au serveur",
     "save": "Enregistrer",
     "saved": "Enregistré",
-    "error": "Échec de l'enregistrement."
+    "error": "Échec de l'enregistrement.",
+    "trackingTitle": "Lien de suivi chez le transporteur",
+    "trackingHint": "Ouvrez le site de suivi de votre transporteur, copiez l'adresse de la page de suivi et remplacez le numéro du colis par '{tracking}'. Exemple : https://site-transporteur/track?code='{tracking}'. Le client le verra sur sa page de commande, vous sur la page commande.",
+    "manualLink": "Lien général (suivi manuel ou transporteur sans lien propre)",
+    "saveLinks": "Enregistrer les liens",
+    "linkInvalid": "Le lien doit commencer par https:// et contenir '{tracking}'."
   },
   "homeSections": {
     "show": "Afficher cette section dans la boutique",
@@ -550,7 +556,7 @@
       "confirmHint": "Affiché au client après sa commande; ouvre le WhatsApp de la boutique avec ce texte. Le numéro WhatsApp de la boutique doit être renseigné plus haut.",
       "tracking": "3) Vous envoyez le suivi après confirmation",
       "trackingHint": "Proposé une seule fois après la confirmation de la commande.",
-      "placeholders": "Utilisables : {name} nom du client, {number} numéro de commande, {total} montant, {tracking} numéro de suivi, {link} lien de suivi. Laissez vide pour revenir au texte par défaut."
+      "placeholders": "Utilisables : '{name}' nom du client, '{number}' numéro de commande, '{total}' montant, '{tracking}' numéro de suivi, '{link}' lien de suivi. Laissez vide pour revenir au texte par défaut."
     }
   },
   "womenPage": {

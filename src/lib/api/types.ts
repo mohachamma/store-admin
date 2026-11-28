@@ -144,6 +144,7 @@ export interface AdminApi {
   saveProfitSettings(token: string, input: ProfitSettings): Promise<void>;
   getDelivery(token: string): Promise<AdminDelivery>;
   setDelivery(token: string, provider: string): Promise<AdminDelivery>;
+  setTrackingUrls(token: string, urls: Record<string, string>): Promise<AdminDelivery>;
   refreshTracking(token: string, id: string): Promise<string>;
   listDiscountCodes(token: string): Promise<AdminDiscountCode[]>;
   saveDiscountCode(token: string, id: string | null, input: DiscountCodeInput): Promise<AdminDiscountCode>;

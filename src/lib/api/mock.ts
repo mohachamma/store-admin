@@ -35,6 +35,7 @@ interface MockDb {
   collections: AdminCollection[];
   wilayas: AdminWilaya[];
   deliveryProvider: string;
+  trackingUrls: Record<string, string>;
   freeShippingOver: number | null;
   codes: AdminDiscountCode[];
   slides: AdminSlide[];
@@ -83,6 +84,7 @@ const db = (): MockDb =>
     orders: sampleOrders(),
     ...sampleCatalog(),
     deliveryProvider: "manual",
+    trackingUrls: {},
     wilayas: [
       [16, "الجزائر", "Alger", 500, 350], [31, "وهران", "Oran", 700, 450], [25, "قسنطينة", "Constantine", 700, 450], [9, "البليدة", "Blida", 500, 350], [19, "سطيف", "Sétif", 800, 550], [30, "ورقلة", "Ouargla", 1200, 800],
     ].map(([code, nameAr, nameFr, homeFee, deskFee]) => ({ code: code as number, nameAr: nameAr as string, nameFr: nameFr as string, homeFee: homeFee as number, deskFee: deskFee as number, homeCost: Math.round((homeFee as number) * 0.7), deskCost: Math.round((deskFee as number) * 0.7), active: true })),
@@ -197,7 +199,7 @@ const rowOf = (o: MockOrder): AdminOrderRow => ({
 });
 const detailOf = (o: MockOrder): AdminOrderDetail => ({
   ...rowOf(o), subtotal: o.subtotal, shippingFee: o.shippingFee, discountTotal: o.discountTotal, discountCode: o.discountCode, deliveryCompany: o.deliveryCompany,
-  deliveryStatus: o.deliveryStatus, confirmedAt: o.confirmedAt, items: o.items,
+  deliveryStatus: o.deliveryStatus, carrierTrackingUrl: null, confirmedAt: o.confirmedAt, items: o.items,
   customer: o.contact ? { ...o.contact, whatsappUrl: `https://wa.me/213${o.contact.phone.slice(1)}`, whatsappAskUrl: `https://wa.me/213${o.contact.phone.slice(1)}?text=${encodeURIComponent(`مرحباً ${o.contact.name}، هل تؤكد طلبك رقم #${o.orderNumber}؟`)}`, telUrl: `tel:${o.contact.phone}` } : null,
   whatsappTrackingUrl: null,
 });
@@ -436,7 +438,15 @@ export const mockApi: AdminApi = {
     db().profitSettings = input;
   },
   async getDelivery() {
-    return { provider: db().deliveryProvider, providers: [{ id: "manual", name: "Manual", configured: true }, { id: "yalidine", name: "Yalidine", configured: true }] };
+    return { provider: db().deliveryProvider, trackingUrls: db().trackingUrls, providers: [{ id: "manual", name: "Manual", configured: true }, { id: "yalidine", name: "Yalidine", configured: true }] };
+  },
+  async setTrackingUrls(_t, urls) {
+    for (const [k, v] of Object.entries(urls)) {
+      if (v && (!/^https:\/\/\S+$/.test(v) || !v.includes("{tracking}"))) throw Object.assign(new Error("invalid link"), { status: 422 });
+      if (v) db().trackingUrls[k] = v;
+      else delete db().trackingUrls[k];
+    }
+    return mockApi.getDelivery("");
   },
   async setDelivery(_t, provider) {
     if (!["manual", "yalidine"].includes(provider)) throw Object.assign(new Error("unknown"), { status: 422 });

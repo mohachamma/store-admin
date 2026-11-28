@@ -94,6 +94,7 @@ export const realApi: AdminApi = {
   getShipping: (token) => call("/admin/shipping", { token }),
   updateWilayas: async (token, updates) => (await call<{ updated: number }>("/admin/shipping/wilayas", { token, method: "PUT", body: JSON.stringify({ updates }) })).updated,
   getDelivery: (token) => call("/admin/delivery", { token }),
+  setTrackingUrls: (token, urls) => call("/admin/delivery", { token, method: "PUT", body: JSON.stringify({ trackingUrls: urls }) }),
   setDelivery: (token, provider) => call("/admin/delivery", { token, method: "PUT", body: JSON.stringify({ provider }) }),
   refreshTracking: async (token, id) => (await call<{ deliveryStatus: string }>(`/admin/orders/${id}/refresh-tracking`, { token, method: "POST" })).deliveryStatus,
   setFreeShipping: async (token, over) => void (await call("/admin/shipping/rules", { token, method: "PUT", body: JSON.stringify({ freeShippingOver: over }) })),
