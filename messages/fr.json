@@ -313,7 +313,8 @@
     "audienceMen": "Homme",
     "audienceHint": "« Femme » et « Tous » apparaissent sur la page Femme.",
     "imageColor": "Couleur de cette photo",
-    "allColors": "Toutes les couleurs"
+    "allColors": "Toutes les couleurs",
+    "soldOutSizes": "Épuisé :"
   },
   "inventory": {
     "costPlaceholder": "Coût",

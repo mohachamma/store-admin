@@ -15,9 +15,9 @@ const overview: Overview = {
     { id: "p4", name: "Hooded Deck Coat", image: "/placeholders/coat-sand.svg", unitsSold: 12, revenue: 154_800 },
   ],
   lowStock: [
-    { variantId: "v1", productName: "Essential Hoodie Black", size: "XS", stock: 0, image: "/placeholders/hoodie-black.svg" },
-    { variantId: "v2", productName: "Chelsea Boot", size: "40", stock: 1, image: "/placeholders/boot-cream.svg" },
-    { variantId: "v3", productName: "Red Skate Mid Sneaker", size: "42", stock: 2, image: "/placeholders/sneaker-red.svg" },
+    { variantId: "v1", productName: "Essential Hoodie Black", size: "XS", color: "black", stock: 0, image: "/placeholders/hoodie-black.svg" },
+    { variantId: "v2", productName: "Chelsea Boot", size: "40", color: "brown", stock: 1, image: "/placeholders/boot-cream.svg" },
+    { variantId: "v3", productName: "Red Skate Mid Sneaker", size: "42", color: "red", stock: 2, image: "/placeholders/sneaker-red.svg" },
   ],
 };
 
@@ -246,7 +246,7 @@ export const mockApi: AdminApi = {
       const cat = d.categories.find((c) => c.id === p.categoryId);
       return {
         id: p.id, slug: p.slug, name: p.name[lang] || p.name.ar, categoryName: cat ? cat.name[lang] || cat.name.ar : "", isPublished: p.isPublished, isNew: p.isNew, audience: p.audience,
-        price: cheapest?.price ?? null, compareAtPrice: cheapest?.compareAtPrice ?? null, totalStock: p.variants.reduce((n, v) => n + v.stock, 0), variantCount: p.variants.length, image: p.images[0]?.url ?? null,
+        price: cheapest?.price ?? null, compareAtPrice: cheapest?.compareAtPrice ?? null, totalStock: p.variants.reduce((n, v) => n + v.stock, 0), variantCount: p.variants.length, soldOut: p.variants.filter((v) => v.stock <= 0).map((v) => ({ color: v.color, size: v.size })), image: p.images[0]?.url ?? null,
       };
     });
     return { items, total: rows.length };

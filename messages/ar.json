@@ -313,7 +313,8 @@
     "audienceMen": "رجال",
     "audienceHint": "«نساء» و«للجميع» يظهران في صفحة النساء.",
     "imageColor": "لون هذه الصورة",
-    "allColors": "كل الألوان"
+    "allColors": "كل الألوان",
+    "soldOutSizes": "نفد:"
   },
   "inventory": {
     "costPlaceholder": "التكلفة",

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Locale } from "@/i18n/config";
 import { api, type OrderStatus } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
+import { colorName } from "@/lib/color-name";
 import { formatDZD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ const statusColor: Record<OrderStatus, string> = {
 export default async function OverviewPage() {
   const token = await requireSession();
   const locale = (await getLocale()) as Locale;
-  const [t, ts, data] = await Promise.all([getTranslations("overview"), getTranslations("status"), api.getOverview(token, locale)]);
+  const [t, ts, tcolors, data] = await Promise.all([getTranslations("overview"), getTranslations("status"), getTranslations("colors"), api.getOverview(token, locale)]);
   const totalOrders = statusOrder.reduce((n, s) => n + data.ordersByStatus[s], 0);
   const money = (n: number) => formatDZD(n, locale);
 
@@ -128,7 +129,7 @@ export default async function OverviewPage() {
                   <Thumb src={v.image} />
                   <div className="min-w-0 flex-1">
                     <p className="label truncate">{v.productName}</p>
-                    <p className="text-xs text-muted-foreground">{t("size", { size: v.size })}</p>
+                    <p className="text-xs text-muted-foreground">{t("size", { size: v.size })}{v.color ? ` · ${colorName(tcolors, v.color)}` : ""}</p>
                   </div>
                   <Badge variant={v.stock === 0 ? "danger" : "warning"}>{v.stock === 0 ? t("outOfStock") : t("left", { count: v.stock })}</Badge>
                 </li>

@@ -8460,6 +8460,7 @@ export interface components {
                 variantId: string;
                 productName: string;
                 size: string;
+                color: string;
                 stock: number;
                 image: string;
             }[];
@@ -8530,6 +8531,10 @@ export interface components {
             compareAtPrice: number | null;
             totalStock: number;
             variantCount: number;
+            soldOut: {
+                color: string;
+                size: string;
+            }[];
             image: string | null;
         };
         AdminProduct: {
