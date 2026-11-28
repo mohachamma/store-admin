@@ -45,7 +45,7 @@ export default async function ProfitPage({ searchParams }: { searchParams: Promi
   const today = ymd(new Date());
   const period: Period = PERIODS.includes(sp.period as Period) ? (sp.period as Period) : "month";
   const range = rangeOf(period, today, sp.from, sp.to);
-  const [t, report, expenses, settings] = await Promise.all([getTranslations("profit"), api.getProfit(token, range), api.listExpenses(token, range), api.getProfitSettings(token)]);
+  const [t, report, expenses, settings] = await Promise.all([getTranslations("profit"), api.getProfit(token, range, locale), api.listExpenses(token, range), api.getProfitSettings(token)]);
   const money = (n: number) => formatDZD(n, locale);
   const d = report.delivered;
   const r = report.returned;
@@ -157,6 +157,33 @@ export default async function ProfitPage({ searchParams }: { searchParams: Promi
           <p className="mt-4 text-[11px] text-muted-foreground">{t("rule")}</p>
         </CardContent>
       </Card>
+
+      {/* Profit per product: the return cost stays with the product, also when it is resold later */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="font-display text-xl font-medium">{t("byProduct")}</h2>
+          <p className="text-xs text-muted-foreground">{t("byProductHint")}</p>
+        </div>
+        {report.byProduct.length === 0 ? (
+          <p className="rounded-[var(--radius-card)] border border-dashed border-border py-10 text-center text-sm text-muted-foreground">{t("noProducts")}</p>
+        ) : (
+          <ul className="divide-y divide-border rounded-[var(--radius-card)] border border-border">
+            {report.byProduct.map((p) => (
+              <li key={p.key} className="space-y-1 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="min-w-0 truncate text-sm font-semibold">{p.name}</p>
+                  <p className={cn("shrink-0 text-sm font-semibold tabular-nums", p.profit < 0 ? "text-destructive" : "text-emerald-400 light:text-emerald-700")} dir="ltr">
+                    {p.profit < 0 ? "−" : "+"}{money(Math.abs(p.profit))}
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("productLine", { sold: p.unitsSold, returned: p.unitsReturned, sales: money(p.sales), cost: money(p.productCost), delivery: money(p.deliveryCost), loss: money(p.returnLoss) })}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {/* Expenses */}
       <section className="space-y-3">

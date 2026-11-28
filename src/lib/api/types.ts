@@ -135,7 +135,7 @@ export interface AdminApi {
   getShipping(token: string): Promise<AdminShipping>;
   updateWilayas(token: string, updates: WilayaUpdate[]): Promise<number>;
   setFreeShipping(token: string, over: number | null): Promise<void>;
-  getProfit(token: string, range: DateRange): Promise<ProfitReport>;
+  getProfit(token: string, range: DateRange, locale: string): Promise<ProfitReport>;
   listExpenses(token: string, range: DateRange): Promise<Expense[]>;
   saveExpense(token: string, id: string | null, input: ExpenseInput): Promise<Expense>;
   deleteExpense(token: string, id: string): Promise<void>;

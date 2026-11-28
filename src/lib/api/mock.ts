@@ -376,6 +376,11 @@ export const mockApi: AdminApi = {
     return updates.length;
   },
   async getProfit(_t, range) {
+    const demo = [
+      { key: "p1", name: "Nylon Full Zip Hoodie", unitsSold: 48, unitsReturned: 2, sales: 379_200, productCost: 211_000, deliveryCost: 21_000, returnLoss: 1_200 },
+      { key: "p2", name: "Red Skate Mid Sneaker", unitsSold: 31, unitsReturned: 3, sales: 303_800, productCost: 170_000, deliveryCost: 14_000, returnLoss: 1_800 },
+      { key: "p3", name: "Slim Denim Jean", unitsSold: 29, unitsReturned: 1, sales: 156_600, productCost: 98_000, deliveryCost: 12_000, returnLoss: 600 },
+    ].map((x) => ({ ...x, profit: x.sales - x.productCost - x.deliveryCost - x.returnLoss }));
     const today = new Date().toISOString().slice(0, 10);
     const from = range.from ?? today.slice(0, 8) + "01";
     const to = range.to ?? today;
@@ -395,6 +400,7 @@ export const mockApi: AdminApi = {
       netProfit: sales + shipping - productCost - deliveryCost - deliveryLoss - returnFees - total,
       returnRatePercent: Math.round((returnedOrders / (deliveredOrders + returnedOrders)) * 100),
       warnings: { itemsWithoutCost: 0, activeWilayasWithoutDeliveryCost: 0 },
+      byProduct: demo,
     };
     return report;
   },

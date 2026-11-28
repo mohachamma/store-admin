@@ -592,7 +592,7 @@
     "returnFee": "Frais de retour par colis",
     "returnFeeHint": "Ce que le transporteur facture pour ramener un colis (en plus de l'aller). Laissez 0 s'il n'y en a pas.",
     "itemsLost": "Les articles retournés sont perdus",
-    "itemsLostHint": "Activez si les articles retournés ne peuvent pas être revendus. Sinon ils retournent en stock, sans perte.",
+    "itemsLostHint": "Les articles retournés reviennent en stock automatiquement, sauf si vous activez « Les articles retournés sont perdus ».",
     "cardFee": "Commission carte %",
     "cardFeeHint": "Pourcentage prélevé par la passerelle de paiement sur chaque commande payée par carte (ex. 2).",
     "period": {
@@ -647,6 +647,10 @@
       "expense": "Vérifiez le montant, la date et le type.",
       "settings": "Vérifiez les valeurs (commission entre 0 et 20).",
       "generic": "Échec de l'enregistrement, réessayez."
-    }
+    },
+    "byProduct": "Bénéfice par produit",
+    "byProductHint": "Le coût d'un retour reste sur le produit; quand il est revendu, son bénéfice tient compte de ce que le retour a coûté. Avant publicité et autres dépenses.",
+    "noProducts": "Aucune vente livrée sur cette période.",
+    "productLine": "Vendus {sold} · retournés {returned} · ventes {sales} · coût {cost} · livraison {delivery} · perte retour {loss}"
   }
 }

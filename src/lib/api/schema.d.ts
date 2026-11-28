@@ -3043,7 +3043,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Move an order forward: confirmed → shipped → delivered / returned, or cancel (restores the stock) */
+        /** Move an order forward: confirmed → shipped → delivered / returned (the goods go back to stock unless the profit settings say returned goods are lost), or cancel (restores the stock) */
         post: {
             parameters: {
                 query?: {
@@ -6284,6 +6284,8 @@ export interface paths {
                 query?: {
                     from?: string;
                     to?: string;
+                    /** @description Language of names and descriptions. Falls back to Arabic when a translation is missing. */
+                    locale?: "ar" | "fr" | "en";
                 };
                 header?: never;
                 path?: never;
@@ -8772,6 +8774,21 @@ export interface components {
                 itemsWithoutCost: number;
                 activeWilayasWithoutDeliveryCost: number;
             };
+            /** @description Profit per product, best first. Order-level amounts (delivery fees, delivery cost, discounts, return costs) are shared between the products of a parcel in proportion to their value. */
+            byProduct: {
+                key: string;
+                name: string;
+                unitsSold: number;
+                unitsReturned: number;
+                sales: number;
+                productCost: number;
+                /** @description Share of the delivery cost of the parcels that carried this product */
+                deliveryCost: number;
+                /** @description Share of what the returned parcels cost (delivery + return fee [+ goods if lost]); this is the return cost carried by the product even when it is resold later */
+                returnLoss: number;
+                /** @description Before ads, other expenses and card fees */
+                profit: number;
+            }[];
         };
         AdminDelivery: {
             provider: string;
