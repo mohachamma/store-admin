@@ -3,6 +3,7 @@ import {
   BadgePercent,
   FolderTree,
   LayoutGrid,
+  Megaphone,
   Package,
   Wallet,
   Settings,
@@ -15,7 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type NavKey = "overview" | "orders" | "products" | "catalog" | "brands" | "offers" | "content" | "shipping" | "discounts" | "profit" | "pages" | "customers" | "settings";
+export type NavKey = "overview" | "orders" | "products" | "catalog" | "brands" | "offers" | "content" | "shipping" | "discounts" | "profit" | "ads" | "pages" | "customers" | "settings";
 
 export interface NavItem {
   key: NavKey;
@@ -37,6 +38,7 @@ export const navItems: NavItem[] = [
   { key: "content", href: "/content", icon: Images, phase: 4 },
   { key: "shipping", href: "/shipping", icon: Truck, phase: 4 },
   { key: "discounts", href: "/discounts", icon: TicketPercent, phase: 4 },
+  { key: "ads", href: "/ads", icon: Megaphone, phase: 7 },
   { key: "profit", href: "/profit", icon: Wallet, phase: 7 },
   { key: "pages", href: "/pages", icon: FileText, phase: 7 },
   { key: "customers", href: "/customers", icon: Users, phase: 6 },

@@ -99,6 +99,7 @@ export const realApi: AdminApi = {
   refreshTracking: async (token, id) => (await call<{ deliveryStatus: string }>(`/admin/orders/${id}/refresh-tracking`, { token, method: "POST" })).deliveryStatus,
   setFreeShipping: async (token, over) => void (await call("/admin/shipping/rules", { token, method: "PUT", body: JSON.stringify({ freeShippingOver: over }) })),
   getProfit: (token, r, locale) => call(`/admin/profit${rangeQuery(r, locale)}`, { token }),
+  getAds: (token, r) => call(`/admin/ads${rangeQuery(r)}`, { token }),
   listExpenses: (token, r) => call(`/admin/expenses${rangeQuery(r)}`, { token }),
   saveExpense: (token, id, input) => call(id ? `/admin/expenses/${id}` : "/admin/expenses", { token, method: id ? "PUT" : "POST", body: JSON.stringify(input) }),
   deleteExpense: async (token, id) => void (await call(`/admin/expenses/${id}`, { token, method: "DELETE" })),

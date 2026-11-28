@@ -10,6 +10,7 @@ import type { Locale } from "@/i18n/config";
 import { api } from "@/lib/api";
 import { requireSession } from "@/lib/auth";
 import { formatDZD } from "@/lib/format";
+import { PERIODS, rangeOf, ymd, type Period } from "@/lib/periods";
 import { cn } from "@/lib/utils";
 import { deleteExpenseAction, saveExpenseAction, saveProfitSettingsAction } from "./actions";
 import { ExpenseForm } from "./ExpenseForm";
@@ -17,25 +18,6 @@ import { SettingsForm } from "./SettingsForm";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("profit"))("title") };
-}
-
-const PERIODS = ["month", "last", "7d", "30d", "custom"] as const;
-type Period = (typeof PERIODS)[number];
-
-/** Dates are counted in Algeria time, like the API does. */
-const ymd = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Algiers" }).format(d);
-const addDays = (s: string, n: number) => ymd(new Date(new Date(`${s}T12:00:00Z`).getTime() + n * 864e5));
-
-function rangeOf(period: Period, today: string, from?: string, to?: string): { from: string; to: string } {
-  const first = `${today.slice(0, 8)}01`;
-  if (period === "last") {
-    const lastEnd = addDays(first, -1);
-    return { from: `${lastEnd.slice(0, 8)}01`, to: lastEnd };
-  }
-  if (period === "7d") return { from: addDays(today, -6), to: today };
-  if (period === "30d") return { from: addDays(today, -29), to: today };
-  if (period === "custom" && from && to && /^\d{4}-\d{2}-\d{2}$/.test(from) && /^\d{4}-\d{2}-\d{2}$/.test(to) && from <= to) return { from, to };
-  return { from: first, to: today };
 }
 
 export default async function ProfitPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {

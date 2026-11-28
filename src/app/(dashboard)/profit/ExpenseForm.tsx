@@ -38,6 +38,9 @@ export async function ExpenseForm({ expense, today }: { expense?: Expense; today
           ))}
         </datalist>
       </Field>
+      <Field label={t("campaign")} htmlFor="ex-campaign" hint={t("campaignHint")}>
+        <Input id="ex-campaign" name="campaign" maxLength={80} dir="ltr" defaultValue={expense?.campaign ?? ""} />
+      </Field>
       <Field label={t("note")} htmlFor="ex-note">
         <Input id="ex-note" name="note" maxLength={200} defaultValue={expense?.note ?? ""} />
       </Field>
